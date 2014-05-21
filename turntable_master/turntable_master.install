@@ -1,0 +1,33 @@
+<?php
+/**
+ * Returns a ref to a new master instance.
+ */
+function get_new_master() {
+  require_once './sites/all/libraries/turntable/turntable_master.php';
+  return new turntable_master();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function turntable_master_schema() {
+  $turntable_master = get_new_master();
+  $schema = $turntable_master->getDatabaseSchema();
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function turntable_master_install() {
+  $turntable_master = get_new_master();
+  $turntable_master->install();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function turntable_master_uninstall() {
+  $turntable_master = get_new_master();
+  $turntable_master->uninstall();
+}

@@ -1,0 +1,8 @@
+name = Turntable Client
+description = Allows users to store nodes to and fetch nodes from the turntable master.
+package = Turntable
+core = 7.x
+files[] = turntable_client.module
+files[] = turntable_client.install
+files[] = turntable_client.admin.inc
+configure=admin/config/content/turntable_client/settings

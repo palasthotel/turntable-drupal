@@ -1,0 +1,30 @@
+<?php
+function turntable_client_menu() {
+  $items['admin/config/turntable-client'] = array(
+    'title' => 'Turntable Client',
+    'description' => 'Synchronize content between various Drupal installations',
+    'position' => 'right',
+    'weight' => -5,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array(
+      'administer site configuration'
+    ),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system')
+  );
+
+  $items['admin/config/turntable-client/settings'] = array(
+    'title' => 'Turntable Client settings',
+    'description' => 'Change how Turntable Client behaves.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'turntable_client_admin_settings'
+    ),
+    'access arguments' => array(
+      'administer site configuration'
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'turntable_client.admin.inc'
+  );
+  return $items;
+}
