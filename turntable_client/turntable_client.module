@@ -29,19 +29,23 @@ function turntable_client_menu() {
   );
 
   $items['node/%/turntable'] = array(
-    'title' => t('Turntable Synchronization'),
+    'title' => t('Turntable'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array(
-      'turntable_client_sync'
+      'turntable_client_sync_node_settings'
     ),
     'access arguments' => array(
-      'administer site configuration'
+      'administer content'
     ),
     'type' => MENU_LOCAL_TASK,
     'file' => 'turntable_client.node.php'
   );
 
   return $items;
+}
+
+function turntable_client_admin_paths_alter(&$paths) {
+  $paths['node/*/turntable'] = TRUE;
 }
 
 function turntable_client_node_presave($node) {
