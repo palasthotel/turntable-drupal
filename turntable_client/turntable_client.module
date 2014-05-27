@@ -28,7 +28,7 @@ function turntable_client_menu() {
     'file' => 'turntable_client.admin.inc'
   );
 
-  $items['node/%/turntable'] = array(
+  $items['node/%/sync'] = array(
     'title' => t('Synchronization'),
     'page callback' => 'turntable_push',
     'access arguments' => array(
@@ -40,8 +40,6 @@ function turntable_client_menu() {
   return $items;
 }
 
-function turntable_client_node_presave($node, $form, &$form_state) {
-  var_dump($node);
-  var_dump($form);
-  var_dump($form_state);
+function turntable_client_node_presave($node) {
+  debug($node, NULL, TRUE);
 }
