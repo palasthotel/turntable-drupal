@@ -1,4 +1,5 @@
 <?php
+
 function turntable_client_menu() {
   $items['admin/config/turntable-client'] = array(
     'title' => 'Turntable Client',
@@ -26,5 +27,21 @@ function turntable_client_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'turntable_client.admin.inc'
   );
+
+  $items['node/%/turntable'] = array(
+    'title' => t('Synchronization'),
+    'page callback' => 'turntable_push',
+    'access arguments' => array(
+      'access content'
+    ),
+    'type' => MENU_LOCAL_TASK
+  );
+
   return $items;
+}
+
+function turntable_client_node_presave($node, $form, &$form_state) {
+  var_dump($node);
+  var_dump($form);
+  var_dump($form_state);
 }
