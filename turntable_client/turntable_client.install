@@ -1,56 +1,19 @@
 <?php
-function turntable_client_schema() {
-  $schema['tt_node_client_info'] = array(
-    // Table description
-    'description' => t('Additional node information for turntable client.'),
-    'fields' => array(
-      'nid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => t('Local node ID.')
-      ),
-      'shard_status' => array(
-        'type' => 'int',
-        'size' => 'tiny',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => t('Shard status: 0 = Not a remote content, 1 = Copy, 2 = Reference')
-      ),
-      'origin_client_id' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => t('ID of the original client.')
-      ),
-      'origin_client_nid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => t('Original node ID.')
-      ),
-      'origin_client_vid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => t('Original node version ID.')
-      ),
-      'last_sync' => array(
-        'type' => 'datetime',
-        'not null' => TRUE,
-        'description' => t('Time of last sync.')
-      )
-    ),
-    'primary key' => array(
-      'nid'
-    )
-  );
 
+/**
+ * Returns a ref to a new client instance.
+ */
+function get_new_client() {
+  require_once './sites/all/libraries/turntable/turntable_client.php';
+  return new turntable_client();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function turntable_client_schema() {
+  $turntable_client = get_new_client();
+  $schema = $turntable_client->getDatabaseSchema();
   return $schema;
 }
 
@@ -58,8 +21,7 @@ function turntable_client_schema() {
  * Implements hook_install().
  */
 function turntable_client_install() {
-  require_once './sites/all/libraries/turntable_client.php';
-  $turntable_client = new turntable_client();
+  $turntable_client = get_new_client();
   $turntable_client->install();
 }
 
@@ -67,5 +29,6 @@ function turntable_client_install() {
  * Implements hook_uninstall().
  */
 function turntable_client_uninstall() {
-  watchdog("Turntable Master Module", "Uninstalling module and deleting fields");
+  $turntable_client = get_new_client();
+  $turntable_client->uninstall();
 }
