@@ -25,14 +25,14 @@ function turntable_client_menu() {
       'administer site configuration'
     ),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'turntable_client.admin.inc'
+    'file' => 'turntable_client.admin.php'
   );
 
   $items['node/%/sync'] = array(
     'title' => t('Synchronization'),
-    'page callback' => 'turntable_push',
-    'access arguments' => array(
-      'access content'
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'turntable_client_sync_settings'
     ),
     'type' => MENU_LOCAL_TASK
   );
@@ -42,4 +42,8 @@ function turntable_client_menu() {
 
 function turntable_client_node_presave($node) {
   debug($node, NULL, TRUE);
+}
+
+function turntable_client_sync_settings($first) {
+  debug($first, NULL, TRUE);
 }
