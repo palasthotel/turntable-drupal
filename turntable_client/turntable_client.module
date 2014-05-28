@@ -48,7 +48,3 @@ function turntable_client_admin_paths_alter(&$paths) {
   $paths['node/*/turntable'] = TRUE;
 }
 
-function turntable_client_node_presave($node) {
-  debug($node, NULL, TRUE);
-}
-

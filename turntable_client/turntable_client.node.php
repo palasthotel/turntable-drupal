@@ -1,40 +1,23 @@
 <?php
 require_once './sites/all/libraries/turntable/turntable_client.php';
 
-function turntable_client_sync_node_settings() {
-  $form['turntable_client_sync_push'] = array(
-    '#title' => t('Push'),
-    '#type' => 'fieldset'
-  );
-
-  $form['turntable_client_sync_push']['push_enabled'] = array(
-    '#title' => t('Push to master'),
-    '#type' => 'checkbox',
-    '#default' => FALSE,
-    '#description' => t(
-        'If this box is checked, changes to the node will be pushed to the Turntable Master.')
-  );
-
-  $form['turntable_client_sync_pull'] = array(
-    '#title' => t('Pull'),
-    '#type' => 'fieldset'
-  );
-
-  $form['turntable_client_sync_pull']['sync_types'] = array(
+function turntable_client_shared_state_settings() {
+  $form['turntable_client_node_shared_states'] = array(
     '#type' => 'value',
     '#value' => array(
-      turntable_client::SYNC_NONE => t('Not a remote content'),
-      turntable_client::SYNC_COPY => t('Copy'),
-      turntable_client::SYNC_REF => t('Reference')
+      turntable_client::SHARED_NONE => t('Not shared (normal node)'),
+      turntable_client::SHARED_COPY => t('Copy'),
+      turntable_client::SHARED_REF => t('Reference'),
+      turntable_client::SHARED_ORIG => t('Original')
     )
   );
 
-  $form['turntable_client_sync_pull']['sync_type'] = array(
+  $form['turntable_client_shared_state'] = array(
     '#type' => 'select',
-    '#title' => t('Synchronization Policy'),
+    '#title' => t('Shared state'),
     '#description' => t(
         'Determines if the local node is a copy of the master node or a reference that gets updated on remote changes (local changes will be overwritten).'),
-    '#options' => $form['turntable_client_sync_pull']['sync_types']['#value']
+    '#options' => $form['turntable_client_shared_states']['#value']
   );
 
   $form['submit'] = array(
@@ -45,7 +28,7 @@ function turntable_client_sync_node_settings() {
   return $form;
 }
 
-function turntable_client_sync_node_settings_submit(&$form, &$form_state) {
+function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
   if (!is_numeric(arg(1))) {
     return;
   }
@@ -54,13 +37,12 @@ function turntable_client_sync_node_settings_submit(&$form, &$form_state) {
   $nid = (int) arg(1);
 
   // form settings
-  $push_enabled = (boolean) $form_state['values']['push_enabled'];
-  $sync_type = $form_state['values']['sync_type'];
+  $shared_state = $form_state['values']['shared_state'];
 
   $client = turntable_client::getInstance();
   $db = $client->getDB();
 
-  $db->setSynchronizationSettings($nid, $push_enabled, $sync_type);
+  $db->setSynchronizationSettings($nid, $shared_state);
 }
 
 function turntable_client_node_presave($node) {
