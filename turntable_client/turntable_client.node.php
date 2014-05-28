@@ -45,16 +45,23 @@ function turntable_client_sync_node_settings() {
   return $form;
 }
 
-function turntable_client_sync_node_settings_submit($form, $form_state) {
+function turntable_client_sync_node_settings_submit(&$form, &$form_state) {
   if (!is_numeric(arg(1))) {
     return;
   }
 
   // get the node's id
-  $nodeid = (int) arg(1);
+  $nid = (int) arg(1);
 
-  // require_once './sites/all/libraries/turntable/turntable_client.php';
+  // form settings
+  $push_enabled = (boolean) $form_state['values']['push_enabled'];
+  $sync_type = $form_state['values']['sync_type'];
 
-  $client = new turntable_client();
-  debug(Database::getConnection());
+  $client = turntable_client::getInstance();
+  $db = $client->getDB();
+
+  $db->setSynchronizationSettings($nid, $push_enabled, $sync_type);
+}
+
+function turntable_client_node_presave($node) {
 }
