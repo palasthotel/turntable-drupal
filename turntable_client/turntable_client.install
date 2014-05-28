@@ -22,6 +22,9 @@ function turntable_client_install() {
  * Implements hook_uninstall().
  */
 function turntable_client_uninstall() {
+  // delete master url variable
+  variable_del('turntable_client_master_url');
+
   $turntable_client = turntable_client::getInstance();
   $turntable_client->uninstall();
 }
