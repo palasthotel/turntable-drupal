@@ -32,7 +32,7 @@ function turntable_client_menu() {
     'title' => t('Turntable'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array(
-      'turntable_client_sync_node_settings'
+      'turntable_client_shared_state_settings'
     ),
     'access arguments' => array(
       'administer content'
