@@ -1,12 +1,11 @@
 <?php
-
 require_once './sites/all/libraries/turntable/turntable_client.php';
 
 /**
  * Implements hook_schema().
  */
 function turntable_client_schema() {
-  $turntable_client = new turntable_client();
+  $turntable_client = turntable_client::getInstance();
   $schema = $turntable_client->getDatabaseSchema();
   return $schema;
 }
@@ -15,7 +14,7 @@ function turntable_client_schema() {
  * Implements hook_install().
  */
 function turntable_client_install() {
-  $turntable_client = new turntable_client();
+  $turntable_client = turntable_client::getInstance();
   $turntable_client->install();
 }
 
@@ -23,6 +22,6 @@ function turntable_client_install() {
  * Implements hook_uninstall().
  */
 function turntable_client_uninstall() {
-  $turntable_client = new turntable_client();
+  $turntable_client = turntable_client::getInstance();
   $turntable_client->uninstall();
 }
