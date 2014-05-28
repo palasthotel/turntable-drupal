@@ -2,7 +2,7 @@
 require_once './sites/all/libraries/turntable/turntable_client.php';
 
 function turntable_client_shared_state_settings() {
-  $form['turntable_client_node_shared_states'] = array(
+  $form['turntable_client_shared_states'] = array(
     '#type' => 'value',
     '#value' => array(
       turntable_client::SHARED_NONE => t('Not shared (normal node)'),
@@ -16,7 +16,7 @@ function turntable_client_shared_state_settings() {
     '#type' => 'select',
     '#title' => t('Shared state'),
     '#description' => t(
-        'Determines if the local node is a copy of the master node or a reference that gets updated on remote changes (local changes will be overwritten).'),
+        'Determines if the local node is not shared, a copy of a node on the master, a reference that gets updated on remote changes (local changes will be overwritten), or the original (remote nodes will get updated).'),
     '#options' => $form['turntable_client_shared_states']['#value']
   );
 
