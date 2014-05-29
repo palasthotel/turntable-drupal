@@ -19,7 +19,7 @@ function turntable_client_admin_settings() {
     '#type' => 'textfield',
     '#title' => t('Turntable Master URL'),
     '#default_value' => variable_get('turntable_client_master_url',
-        'http://turntable-master.palasthotel.de/'),
+        'http://turntable-master.palasthotel.de/api/turntable-master/v1'),
     '#description' => t('The URL of the linked Turntable Master instance.')
   );
   $form['#submit'][] = 'turntable_client_admin_settings_submit';
