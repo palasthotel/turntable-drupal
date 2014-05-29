@@ -1,1 +1,147 @@
 <?php
+
+/**
+ * @file
+ *
+ * Resource (API) definitions.
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function turntable_master_services_resources() {
+  return array(
+    'node_shared' => array(
+      'create' => array(
+        'help' => t('Creates a new shared node'),
+        'file' => array(
+          'file' => 'service.php',
+          'module' => 'turntable_master'
+        ),
+        'callback' => 'turntable_master_create_shared_node',
+        'args' => array(
+          array(
+            'name' => 'data',
+            'type' => 'struct',
+            'description' => 'The shared node object',
+            'source' => 'data',
+            'optional' => FALSE
+          )
+        )
+      ),
+      'update' => array(
+        'help' => t('Updates a shared node'),
+        'file' => array(
+          'file' => 'service.php',
+          'module' => 'turntable_master'
+        ),
+        'callback' => 'turntable_master_update_shared_node',
+        'args' => array(
+          array(
+            'name' => 'id',
+            'type' => 'int',
+            'description' => 'The id of the node to update',
+            'source' => array(
+              'path' => '0'
+            ),
+            'optional' => FALSE
+          ),
+          array(
+            'name' => 'data',
+            'type' => 'struct',
+            'description' => 'The node data object',
+            'source' => 'data',
+            'optional' => FALSE
+          )
+        )
+      ),
+      'index' => array(
+        'help' => t('Retrieves a list of shared nodes'),
+        'file' => array(
+          'file' => 'service.php',
+          'module' => 'turntable_master'
+        ),
+        'callback' => 'turntable_master_update_shared_node',
+        'args' => array(
+          array(
+            'name' => 'page',
+            'type' => 'int',
+            'description' => '',
+            'source' => array(
+              'param' => 'page'
+            ),
+            'optional' => TRUE,
+            'default value' => 0
+          ),
+          array(
+            'name' => 'parameters',
+            'type' => 'array',
+            'description' => '',
+            'source' => 'param',
+            'optional' => TRUE,
+            'default value' => array()
+          )
+        )
+      )
+    )
+  );
+}
+
+/**
+ * Endpoint definition.
+ */
+function turntable_master_default_services_endpoint() {
+  $endpoints = array();
+
+  $endpoint = new stdClass();
+  $endpoint->disabled = FALSE; // Edit this to TRUE to make a default endpoint disabled initially
+  $endpoint->api_version = 3;
+  $endpoint->name = 'turntable_v1';
+  $endpoint->server = 'rest_server';
+  $endpoint->path = 'api/turntable/v1';
+  $endpoint->authentication = array();
+
+  // server settings
+  $endpoint->server_settings = array(
+    'formatters' => array(
+      'json' => TRUE,
+      'bencode' => FALSE,
+      'jsonp' => FALSE,
+      'php' => FALSE,
+      'xml' => FALSE
+    ),
+    'parsers' => array(
+      'application/json' => TRUE,
+      'application/vnd.php.serialized' => FALSE,
+      'application/x-www-form-urlencoded' => FALSE,
+      'application/xml' => FALSE,
+      'multipart/form-data' => FALSE,
+      'text/xml' => FALSE
+    )
+  );
+
+  // resource definitions
+  $endpoint->resources = array(
+    'node_shared' => array(
+      'operations' => array(
+        'create' => array(
+          'enabled' => '1'
+        ),
+        'update' => array(
+          'enabled' => '1'
+        ),
+        'index' => array(
+          'enabled' => '1'
+        )
+      )
+    )
+  );
+
+  // debug mode enabled
+  $endpoint->debug = 1;
+
+  $endpoints[] = $endpoint;
+
+  return $endpoints;
+}
+
