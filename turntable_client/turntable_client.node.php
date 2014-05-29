@@ -1,5 +1,6 @@
 <?php
 require_once './sites/all/libraries/turntable/turntable_client.php';
+require_once './sites/all/libraries/turntable/core/http.php';
 
 function get_node_id() {
   if (!is_numeric(arg(1))) {
@@ -33,7 +34,6 @@ function turntable_client_shared_state_settings() {
     '#options' => $form['turntable_client_shared_states']['#value'],
     '#default_value' => $shared_state
   );
-
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit')
@@ -51,13 +51,33 @@ function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
   $nid = (int) arg(1);
 
   // form settings
-  $shared_state = $form_state['values']['turntable_client_shared_state'];
+  $shared_state = (int) $form_state['values']['turntable_client_shared_state'];
+  $turntable_client = turntable_client::getInstance();
+  $turntable_client->getDB()->setSharedState($nid, $shared_state);
 
-  $client = turntable_client::getInstance();
-  $db = $client->getDB();
-
-  $db->setSharedState($nid, $shared_state);
+  // post to master
+  if ($shared_state === turntable_client::SHARED_ORIG) {
+    $node = node_load($nid);
+    send_shared_node($turntable_client, $node);
+  }
 }
 
 function turntable_client_node_presave($node) {
+  $turntable_client = turntable_client::getInstance();
+  $shared_state = $turntable_client->getDB()->getSharedState($node);
+
+  if ($shared_state === turntable_client::SHARED_ORIG) {
+    send_shared_node($turntable_client, $node);
+  }
+}
+
+function send_shared_node($turntable_client, $node) {
+  global $base_url;
+  global $user;
+
+  $turntable_client = turntable_client::getInstance();
+  $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
+  $turntable_client->setClientID($base_url);
+
+  $turntable_client->sendSharedNode($node, $user);
 }
