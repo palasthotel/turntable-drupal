@@ -7,4 +7,5 @@ files[] = turntable_master.module
 files[] = turntable_master.install
 files[] = turntable_master.admin.php
 files[] = turntable_master_menu.php
+files[] = turntable_master.service.php
 configure=admin/config/content/turntable_master/settings
