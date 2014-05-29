@@ -5,7 +5,7 @@ require_once './sites/all/libraries/turntable/turntable_master.php';
  * Implements hook_schema().
  */
 function turntable_master_schema() {
-  $turntable_master = new turntable_master();
+  $turntable_master = turntable_master::getInstance();
   $schema = $turntable_master->getDatabaseSchema();
   return $schema;
 }
@@ -14,7 +14,7 @@ function turntable_master_schema() {
  * Implements hook_install().
  */
 function turntable_master_install() {
-  $turntable_master = new turntable_master();
+  $turntable_master = turntable_master::getInstance();
   $turntable_master->install();
 }
 
@@ -22,6 +22,6 @@ function turntable_master_install() {
  * Implements hook_uninstall().
  */
 function turntable_master_uninstall() {
-  $turntable_master = new turntable_master();
+  $turntable_master = turntable_master::getInstance();
   $turntable_master->uninstall();
 }
