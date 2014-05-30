@@ -27,7 +27,12 @@ function turntable_master_services_resources() {
             'source' => 'data',
             'optional' => FALSE
           )
-        )
+        ),
+        'access callback' => 'turntable_master_access',
+        'access arguments' => array(
+          'create'
+        ),
+        'access arguments append' => TRUE
       ),
       'update' => array(
         'help' => t('Updates a shared node'),
@@ -53,7 +58,12 @@ function turntable_master_services_resources() {
             'source' => 'data',
             'optional' => FALSE
           )
-        )
+        ),
+        'access callback' => 'turntable_master_access',
+        'access arguments' => array(
+          'update'
+        ),
+        'access arguments append' => TRUE
       ),
       'index' => array(
         'help' => t('Retrieves a list of shared nodes'),
@@ -81,7 +91,12 @@ function turntable_master_services_resources() {
             'optional' => TRUE,
             'default value' => array()
           )
-        )
+        ),
+        'access callback' => 'turntable_master_access',
+        'access arguments' => array(
+          'index'
+        ),
+        'access arguments append' => TRUE
       )
     )
   );
@@ -143,5 +158,10 @@ function turntable_master_default_services_endpoint() {
   $endpoints[] = $endpoint;
 
   return $endpoints;
+}
+
+function turntable_master_access($op, $args) {
+  // grant access without authentication/authorization
+  return TRUE;
 }
 
