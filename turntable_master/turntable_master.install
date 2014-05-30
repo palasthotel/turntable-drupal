@@ -6,7 +6,7 @@ require_once './sites/all/libraries/turntable/turntable_master.php';
  */
 function turntable_master_schema() {
   $turntable_master = turntable_master::getInstance();
-  $schema = $turntable_master->getDatabaseSchema();
+  $schema = $turntable_master->getDB()->getSchema();
   return $schema;
 }
 

@@ -6,7 +6,7 @@ require_once './sites/all/libraries/turntable/turntable_client.php';
  */
 function turntable_client_schema() {
   $turntable_client = turntable_client::getInstance();
-  $schema = $turntable_client->getDatabaseSchema();
+  $schema = $turntable_client->getDB()->getSchema();
   return $schema;
 }
 
