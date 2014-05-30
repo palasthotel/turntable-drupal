@@ -34,37 +34,6 @@ function turntable_master_services_resources() {
         ),
         'access arguments append' => TRUE
       ),
-      'update' => array(
-        'help' => t('Updates a shared node'),
-        'file' => array(
-          'file' => 'service.php',
-          'module' => 'turntable_master'
-        ),
-        'callback' => 'turntable_master_update_shared_node',
-        'args' => array(
-          array(
-            'name' => 'id',
-            'type' => 'int',
-            'description' => 'The id of the node to update',
-            'source' => array(
-              'path' => '0'
-            ),
-            'optional' => FALSE
-          ),
-          array(
-            'name' => 'data',
-            'type' => 'struct',
-            'description' => 'The node data object',
-            'source' => 'data',
-            'optional' => FALSE
-          )
-        ),
-        'access callback' => 'turntable_master_access',
-        'access arguments' => array(
-          'update'
-        ),
-        'access arguments append' => TRUE
-      ),
       'index' => array(
         'help' => t('Retrieves a list of shared nodes'),
         'file' => array(
@@ -140,9 +109,6 @@ function turntable_master_default_services_endpoint() {
     'node-shared' => array(
       'operations' => array(
         'create' => array(
-          'enabled' => '1'
-        ),
-        'update' => array(
           'enabled' => '1'
         ),
         'index' => array(
