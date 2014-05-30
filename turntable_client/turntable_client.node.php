@@ -79,5 +79,21 @@ function send_shared_node($turntable_client, $node) {
   $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
   $turntable_client->setClientID($base_url);
 
-  $turntable_client->sendSharedNode($node, $user);
+  $shared_node = array();
+
+  // set data
+  $shared_node['title'] = $ew->label();
+  $shared_node['body'] = field_get_items('node', $node, 'body', $node->language)[0]['safe_value'];
+  $shared_node['language'] = $node->language;
+
+  // set metadata
+  $shared_node['node_id'] = $node->nid;
+  $shared_node['revision_uid'] = $node->revision_uid;
+  $shared_node['content_type'] = $node->type;
+  $shared_node['user_name'] = $user->name;
+  $shared_node['author_name'] = $node->name;
+  $shared_node['last_sync'] = (string) time();
+  $shared_node['complete_content'] = json_encode($node);
+
+  $turntable_client->sendSharedNode($shared_node);
 }
