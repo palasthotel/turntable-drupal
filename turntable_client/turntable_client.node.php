@@ -82,8 +82,8 @@ function send_shared_node($turntable_client, $node) {
   $shared_node = array();
 
   // set data
-  $shared_node['title'] = $ew->label();
-  $shared_node['body'] = field_get_items('node', $node, 'body', $node->language)[0]['safe_value'];
+  $shared_node['title'] = $node->title;
+  $shared_node['body'] = $node->body[$node->language][0]['safe_value'];
   $shared_node['language'] = $node->language;
 
   // set metadata
