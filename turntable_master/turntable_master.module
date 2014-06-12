@@ -13,7 +13,7 @@ function turntable_master_services_resources() {
   return array(
     'node-shared' => array(
       'create' => array(
-        'help' => t('Creates a new shared node'),
+        'help' => t('Saves a (possibly new) shared node'),
         'file' => array(
           'file' => 'service.php',
           'module' => 'turntable_master'
@@ -30,7 +30,7 @@ function turntable_master_services_resources() {
         ),
         'access callback' => 'turntable_master_access',
         'access arguments' => array(
-          'create'
+          'save'
         ),
         'access arguments append' => TRUE
       ),

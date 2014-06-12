@@ -7,21 +7,14 @@ function turntable_master_save_shared_node($shared_node) {
 
   // get the id of a possibly existing node
   $nid = $db->getSharedNodeID($shared_node);
+
+  $old_nid = $nid;
+
   if ($nid === FALSE) {
-    // load the node
-    $local_node = node_load($nid);
-
-    // update and store the node
-    $local_node->title = $shared_node['title'];
-
-    $shared_node['nid'] = $nid;
-
-    $result = $db->saveSharedNode($shared_node);
-  } else {
     global $user; // use the current (anonymous) user
 
     $values = array(
-      'type' => 'YOUR_NODE_TYPE',
+      'type' => 'shared',
       'uid' => $user->uid,
       'status' => 0,
       'comment' => 0,
@@ -29,20 +22,46 @@ function turntable_master_save_shared_node($shared_node) {
     );
 
     // create entity and wrapper
-    $entity = entity_create('node', $values);
-    $ewrapper = entity_metadata_wrapper('node', $entity);
+    $local_node = entity_create('node', $values);
+    $ewrapper = entity_metadata_wrapper('node', $local_node);
 
     // set title,
     $ewrapper->title->set($shared_node['title']);
+
     // body
     $ewrapper->body->set(array(
       'value' => $shared_node['body']
     ));
+
+    // save node
+    $ewrapper->save();
+
+    $nid = $local_node->nid;
+  } else {
+    // // load the node
+    $local_node = node_load($nid);
+
+    $ewrapper = entity_metadata_wrapper('node', $local_node);
+
+    // update and store the node
+    $ewrapper->title->set($shared_node['title']);
+
+    // save node
+    $ewrapper->save();
   }
-  return $result;
+
+  $shared_node['nid'] = $nid;
+  return $db->saveSharedNode($shared_node);
+
+  // return array(
+  // 'old' => $old_nid,
+  // 'nid' => $nid
+  // );
 }
 
 function turntable_master_index_shared_nodes() {
-  // TODO to be implemented
-  return array();
+  return array(
+    'a',
+    'b'
+  );
 }
