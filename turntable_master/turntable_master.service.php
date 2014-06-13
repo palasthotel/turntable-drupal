@@ -37,8 +37,12 @@ function turntable_master_save_shared_node($shared_node) {
     $ewrapper->save();
 
     $nid = $local_node->nid;
+
+    $shared_node['nid'] = $nid;
+
+    return $db->addSharedNode($shared_node);
   } else {
-    // // load the node
+    // load the node
     $local_node = node_load($nid);
 
     $ewrapper = entity_metadata_wrapper('node', $local_node);
@@ -46,22 +50,19 @@ function turntable_master_save_shared_node($shared_node) {
     // update and store the node
     $ewrapper->title->set($shared_node['title']);
 
+    // body
+    $ewrapper->body->set(array(
+      'value' => $shared_node['body']
+    ));
+
     // save node
     $ewrapper->save();
+
+    $shared_node['nid'] = $nid;
+
+    return $db->updateSharedNode($shared_node);
   }
-
-  $shared_node['nid'] = $nid;
-  return $db->saveSharedNode($shared_node);
-
-  // return array(
-  // 'old' => $old_nid,
-  // 'nid' => $nid
-  // );
 }
 
 function turntable_master_index_shared_nodes() {
-  return array(
-    'a',
-    'b'
-  );
 }

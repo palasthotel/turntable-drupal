@@ -95,5 +95,18 @@ function send_shared_node($turntable_client, $node) {
   $shared_node['last_sync'] = (string) time();
   $shared_node['complete_content'] = json_encode($node);
 
-  $turntable_client->sendSharedNode($shared_node);
+  $response = $turntable_client->sendSharedNode($shared_node);
+
+  if (!$response) {
+    drupal_set_message(t('Turntable Master could not process your request.'), 'warning');
+    return;
+  } else {
+    $decoded = json_decode($response);
+    if (!$decoded[0]) {
+      drupal_set_message(t('Turntable Master did not accept your request.'), 'warning');
+      return;
+    }
+  }
+
+  drupal_set_message(t('Settings saved.'));
 }
