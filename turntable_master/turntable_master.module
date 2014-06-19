@@ -43,22 +43,14 @@ function turntable_master_services_resources() {
         'callback' => 'turntable_master_index_shared_nodes',
         'args' => array(
           array(
-            'name' => 'page',
-            'type' => 'int',
-            'description' => '',
+            'name' => 'query',
+            'type' => 'string',
+            'description' => 'Full text search string',
             'source' => array(
               'param' => 'page'
             ),
             'optional' => TRUE,
-            'default value' => 0
-          ),
-          array(
-            'name' => 'parameters',
-            'type' => 'array',
-            'description' => '',
-            'source' => 'param',
-            'optional' => TRUE,
-            'default value' => array()
+            'default value' => ''
           )
         ),
         'access callback' => 'turntable_master_access',
@@ -82,7 +74,7 @@ function turntable_master_default_services_endpoint() {
   $endpoint->api_version = 3;
   $endpoint->name = 'turntable_master_v1';
   $endpoint->server = 'rest_server';
-  $endpoint->path = 'api/turntable-master/v1';
+  $endpoint->path = 'api/turntable/v1';
   $endpoint->authentication = array();
 
   // server settings
