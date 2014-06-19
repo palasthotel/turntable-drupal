@@ -17,6 +17,8 @@ function turntable_client_install() {
   variable_set('turntable_client_master_url',
       'http://turntable-master.palasthotel.de/');
 
+  variable_set('turntable_client_update_interval', 24);
+
   $turntable_client = turntable_client::getInstance();
   $turntable_client->install();
 }
