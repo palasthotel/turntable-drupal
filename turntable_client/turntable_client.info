@@ -6,5 +6,4 @@ core = 7.x
 files[] = turntable_client.module
 files[] = turntable_client.install
 files[] = turntable_client.settings.php
-files[] = turntable_client.node.php
 configure=admin/config/turntable-client/settings
