@@ -23,7 +23,7 @@ function turntable_client_admin_settings() {
   );
 
   $form['turntable_client_update_interval'] = array(
-    '#type' => 'select',
+    '#type' => 'textfield',
     '#title' => t('Turntable update interval'),
     '#default_value' => variable_get('turntable_client_update_interval'),
     '#description' => t(
