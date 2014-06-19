@@ -8,8 +8,11 @@ function turntable_client_content_search() {
         'Search terms. Searches all fields that are shared within the node.')
   );
   $form['#submit'][] = 'turntable_client_content_search_submit';
-  return system_settings_form($form);
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Search'));
+
+  return $form;
 }
 
 function turntable_client_content_search_submit(&$form, &$form_state) {
+  debug($form_state);
 }
