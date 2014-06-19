@@ -64,5 +64,6 @@ function turntable_master_save_shared_node($shared_node) {
   }
 }
 
-function turntable_master_index_shared_nodes() {
+function turntable_master_index_shared_nodes($page) {
+  return (int) $page;
 }

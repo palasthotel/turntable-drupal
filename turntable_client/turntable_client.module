@@ -40,7 +40,19 @@ function turntable_client_menu() {
       'administer content'
     ),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'turntable_client.node.php'
+    'file' => 'turntable_client.module'
+  );
+
+  $items['admin/content/turntable-search'] = array(
+    'title' => t('Turntable'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => 'turntable_client_content_search',
+    'access arguments' => array(
+      'administer content',
+      'create story content'
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'turntable_client.search.php'
   );
 
   return $items;
@@ -48,6 +60,7 @@ function turntable_client_menu() {
 
 function turntable_client_admin_paths_alter(&$paths) {
   $paths['node/*/turntable'] = TRUE;
+  $paths['admin/content/turntable-search'] = TRUE;
 }
 
 function get_node_id() {
@@ -91,12 +104,12 @@ function turntable_client_shared_state_settings() {
 }
 
 function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
-  if (!is_numeric(arg(1))) {
+  // get the node's id
+  $nid = get_node_id();
+
+  if ($nid === -1) {
     return;
   }
-
-  // get the node's id
-  $nid = (int) arg(1);
 
   // form settings
   $shared_state = (int) $form_state['values']['turntable_client_shared_state'];
