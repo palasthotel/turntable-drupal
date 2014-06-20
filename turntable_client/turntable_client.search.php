@@ -1,4 +1,5 @@
 <?php
+require_once './sites/all/libraries/turntable/turntable_client.php';
 
 function turntable_client_content_search($form, &$form_state) {
   $form['turntable_client_content_search'] = array(
@@ -14,7 +15,15 @@ function turntable_client_content_search($form, &$form_state) {
   );
 
   if (!empty($form_state['values']['turntable_client_content_search'])) {
-    debug($form_state['values']['turntable_client_content_search']);
+    $turntable_client = turntable_client::getInstance();
+    $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
+
+    $query = $form_state['values']['turntable_client_content_search'];
+
+    $results = $turntable_client->findRemoteContent($query);
+
+    debug($results);
+
     $form['results'] = array(
       '#type' => 'table',
       '#title' => t('Results'),
@@ -22,13 +31,11 @@ function turntable_client_content_search($form, &$form_state) {
       '#theme' => 'table',
       '#header' => array(
         t('Title'),
+        t('Author'),
         t('Date')
       ),
       '#rows' => array(
-        array(
-          'a',
-          'b'
-        )
+        array()
       )
     );
   }
