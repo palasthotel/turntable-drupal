@@ -57,7 +57,7 @@ function turntable_client_content_search($form, &$form_state) {
 
     $form['copy'] = array(
       '#type' => 'submit',
-      '#value' => t('Save as copy'),
+      '#value' => t('Import as copy'),
       '#submit' => array(
         'turntable_client_content_search_create_copy'
       )
@@ -65,7 +65,7 @@ function turntable_client_content_search($form, &$form_state) {
 
     $form['reference'] = array(
       '#type' => 'submit',
-      '#value' => t('Save as reference'),
+      '#value' => t('Import as reference'),
       '#submit' => array(
         'turntable_client_content_search_create_ref'
       )
@@ -77,12 +77,34 @@ function turntable_client_content_search($form, &$form_state) {
 
 function turntable_client_content_search_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
+
+  if (empty($form_state['values']['turntable_client_content_search'])) {
+    drupal_set_message(t('Empty search query.'), 'warning');
+  }
+}
+
+function turntable_client_content_search_create(&$form_state, $copy) {
+  $nid = $form_state['values']['results'];
+
+  if ($nid === '') {
+    drupal_set_message(t('Empty selection.'), 'warning');
+    $form_state['rebuild'] = TRUE;
+  } else {
+    debug((int) $nid);
+    if ($copy) {
+      drupal_set_message(
+          t('Successfully imported selected node as a reference.'), 'status');
+    } else {
+      drupal_set_message(t('Successfully imported selected node as a copy.'),
+          'info');
+    }
+  }
 }
 
 function turntable_client_content_search_create_copy($form, &$form_state) {
-  debug($form_state);
+  turntable_client_content_search_create($form_state, TRUE); // delegate
 }
 
 function turntable_client_content_search_create_ref($form, &$form_state) {
-  debug($form_state);
+  turntable_client_content_search_create($form_state, FALSE); // delegate
 }
