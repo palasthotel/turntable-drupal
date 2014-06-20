@@ -46,10 +46,11 @@ function turntable_client_menu() {
   $items['admin/content/turntable-search'] = array(
     'title' => t('Turntable'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => 'turntable_client_content_search',
+    'page arguments' => array(
+      'turntable_client_content_search'
+    ),
     'access arguments' => array(
-      'administer content',
-      'create story content'
+      'administer content'
     ),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'turntable_client.search.php'
@@ -77,27 +78,40 @@ function turntable_client_shared_state_settings() {
 
   $shared_state = turntable_client::getInstance()->getDB()->getSharedState($nid);
 
-  $form['turntable_client_shared_states'] = array(
-    '#type' => 'value',
-    '#value' => array(
-      turntable_client::SHARED_NONE => t('Not shared (normal node)'),
-      turntable_client::SHARED_COPY => t('Copy'),
-      turntable_client::SHARED_REF => t('Reference'),
-      turntable_client::SHARED_ORIG => t('Original')
-    )
-  );
+  if ($shared_state == turntable_client::SHARED_COPY ||
+       $shared_state == turntable_client::SHARED_REF) {
+    $form['turntable_client_shared_states'] = array(
+      '#type' => 'value',
+      '#value' => array(
+        turntable_client::SHARED_COPY => t('Copy'),
+        turntable_client::SHARED_REF => t('Reference')
+      )
+    );
 
-  $form['turntable_client_shared_state'] = array(
-    '#type' => 'select',
-    '#title' => t('Shared state'),
-    '#description' => t(
-        'Determines if the local node is not shared, a copy of a node on the master, a reference that gets updated on remote changes (local changes will be overwritten), or the original (remote nodes will get updated).'),
-    '#options' => $form['turntable_client_shared_states']['#value'],
-    '#default_value' => $shared_state
-  );
+    $form['turntable_client_shared_state'] = array(
+      '#type' => 'select',
+      '#title' => t('Shared state'),
+      '#description' => t(
+          'Determines if the local node is a copy of a node on the master or a reference that gets updated on remote changes (local changes will be overwritten)'),
+      '#options' => $form['turntable_client_shared_states']['#value'],
+      '#default_value' => $shared_state
+    );
+  } else {
+    // determine if the node is shared
+    $is_shared = $shared_state == turntable_client::SHARED_ORIG;
+
+    $form['turntable_client_shared_state'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Share this node'),
+      '#description' => t(
+          'Determines if the local node is being shared with the master.'),
+      '#default_value' => $is_shared
+    );
+  }
+
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Submit')
+    '#value' => t('Save')
   );
 
   return $form;
@@ -107,7 +121,7 @@ function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
   // get the node's id
   $nid = get_node_id();
 
-  if ($nid === -1) {
+  if ($nid == -1) {
     return;
   }
 
