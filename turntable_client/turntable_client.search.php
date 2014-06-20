@@ -23,9 +23,7 @@ function turntable_client_content_search($form, &$form_state) {
 
     $query = $form_state['values']['turntable_client_content_search'];
 
-    $results = $turntable_client->findSharedNode($query);
-
-    $shared_nodes = json_decode($results);
+    $shared_nodes = $turntable_client->findSharedNode($query);
 
     $rows = array();
 
