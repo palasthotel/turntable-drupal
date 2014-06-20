@@ -4,14 +4,17 @@ require_once './sites/all/libraries/turntable/turntable_client.php';
 function turntable_client_content_search($form, &$form_state) {
   $form['turntable_client_content_search'] = array(
     '#type' => 'textfield',
-    '#title' => t('Query'),
+    '#title' => t('Search'),
     '#description' => t(
-        'Search terms. Searches all fields that are shared within the node.')
+        'Searches all fields that are shared within the node. Terms are space separated.')
   );
-  $form['#submit'][] = 'turntable_client_content_search_submit';
-  $form['submit'] = array(
+
+  $form['turntable_client_content_search_submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Search')
+    '#value' => t('Search'),
+    '#submit' => array(
+      'turntable_client_content_search_submit'
+    )
   );
 
   if (!empty($form_state['values']['turntable_client_content_search'])) {
@@ -20,22 +23,51 @@ function turntable_client_content_search($form, &$form_state) {
 
     $query = $form_state['values']['turntable_client_content_search'];
 
-    $results = $turntable_client->findRemoteContent($query);
+    $results = $turntable_client->findSharedNode($query);
 
-    debug($results);
+    $shared_nodes = json_decode($results);
+
+    $rows = array();
+
+    // preload labels
+    $label_none = t('None');
+    $label_copy = t('Copy');
+    $label_ref = t('Reference');
+
+    foreach ($shared_nodes as $shared_node) {
+      $rows[$shared_node->nid] = array(
+        $shared_node->title,
+        $shared_node->author,
+        $shared_node->last_sync
+      );
+    }
 
     $form['results'] = array(
-      '#type' => 'table',
+      '#type' => 'tableselect',
       '#title' => t('Results'),
       '#tree' => TRUE,
-      '#theme' => 'table',
       '#header' => array(
         t('Title'),
         t('Author'),
-        t('Date')
+        t('Last sync')
       ),
-      '#rows' => array(
-        array()
+      '#options' => $rows,
+      '#multiple' => FALSE
+    );
+
+    $form['copy'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save as copy'),
+      '#submit' => array(
+        'turntable_client_content_search_create_copy'
+      )
+    );
+
+    $form['reference'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save as reference'),
+      '#submit' => array(
+        'turntable_client_content_search_create_ref'
       )
     );
   }
@@ -45,4 +77,12 @@ function turntable_client_content_search($form, &$form_state) {
 
 function turntable_client_content_search_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
+}
+
+function turntable_client_content_search_create_copy($form, &$form_state) {
+  debug($form_state);
+}
+
+function turntable_client_content_search_create_ref($form, &$form_state) {
+  debug($form_state);
 }
