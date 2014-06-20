@@ -40,21 +40,21 @@ function turntable_master_services_resources() {
           'file' => 'service.php',
           'module' => 'turntable_master'
         ),
-        'callback' => 'turntable_master_index_shared_nodes',
+        'callback' => 'turntable_master_find_shared_node',
         'args' => array(
           array(
             'name' => 'query',
-            'type' => 'struct',
-            'description' => 'Full text search string',
+            'type' => 'string',
+            'description' => 'Search query',
             'source' => array(
-              'param' => 'page'
+              'param' => 'query'
             ),
             'optional' => FALSE
           )
         ),
         'access callback' => 'turntable_master_access',
         'access arguments' => array(
-          'index'
+          'read'
         ),
         'access arguments append' => TRUE
       )
@@ -102,7 +102,16 @@ function turntable_master_default_services_endpoint() {
         'create' => array(
           'enabled' => '1'
         ),
-        'index' => array(
+        'read' => array(
+          'enabled' => '1'
+        )
+      )
+    ),
+    // this is only a workaround: creating node-shared-search doesn't really
+    // make sense but we need to be able to send data with every request
+    'node-shared-search' => array(
+      'operations' => array(
+        'create' => array(
           'enabled' => '1'
         )
       )
