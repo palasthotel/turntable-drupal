@@ -1,4 +1,6 @@
 <?php
+// FIXME
+ini_set('display_errors', TRUE);
 
 /**
  * @file
