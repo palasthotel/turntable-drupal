@@ -2,6 +2,14 @@
 // FIXME
 ini_set('display_errors', TRUE);
 
+require_once './sites/all/libraries/turntable/turntable_master.php';
+
+function turntable_master_node_delete($node) {
+  $db = turntable_master::getInstance()->getDB();
+
+  $db->deleteSharedNode($node->nid);
+}
+
 /**
  * @file
  *
@@ -33,6 +41,30 @@ function turntable_master_services_resources() {
         'access callback' => 'turntable_master_access',
         'access arguments' => array(
           'save'
+        ),
+        'access arguments append' => TRUE
+      ),
+      'read' => array(
+        'help' => t('Gets a single shared node by its ID'),
+        'file' => array(
+          'file' => 'service.php',
+          'module' => 'turntable_master'
+        ),
+        'callback' => 'turntable_master_find_shared_node',
+        'args' => array(
+          array(
+            'name' => 'query',
+            'type' => 'string',
+            'description' => 'Search query',
+            'source' => array(
+              'param' => 'query'
+            ),
+            'optional' => FALSE
+          )
+        ),
+        'access callback' => 'turntable_master_access',
+        'access arguments' => array(
+          'read'
         ),
         'access arguments append' => TRUE
       ),
