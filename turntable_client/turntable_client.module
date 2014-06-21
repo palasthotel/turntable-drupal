@@ -55,7 +55,7 @@ function turntable_client_menu() {
     'access arguments' => array(
       'administer content'
     ),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
     'file' => 'turntable_client.search.php'
   );
 
