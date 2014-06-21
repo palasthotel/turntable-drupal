@@ -81,15 +81,23 @@ function turntable_client_content_search_submit($form, &$form_state) {
   }
 }
 
-function turntable_client_content_search_create(&$form_state, $copy) {
+function turntable_client_content_search_create(&$form_state, $asReference) {
   $nid = $form_state['values']['results'];
 
   if ($nid === '') {
     drupal_set_message(t('Empty selection.'), 'warning');
     $form_state['rebuild'] = TRUE;
   } else {
-    debug((int) $nid);
-    if ($copy) {
+    $nid = (int) $nid;
+
+    $turntable_client = turntable_client::getInstance();
+    $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
+
+    $shared_node = $turntable_client->getSharedNode($nid);
+
+    debug($shared_node);
+
+    if ($asReference) {
       drupal_set_message(
           t('Successfully imported selected node as a reference.'), 'status');
     } else {
@@ -100,9 +108,9 @@ function turntable_client_content_search_create(&$form_state, $copy) {
 }
 
 function turntable_client_content_search_create_copy($form, &$form_state) {
-  turntable_client_content_search_create($form_state, TRUE); // delegate
+  turntable_client_content_search_create($form_state, FALSE); // delegate
 }
 
 function turntable_client_content_search_create_ref($form, &$form_state) {
-  turntable_client_content_search_create($form_state, FALSE); // delegate
+  turntable_client_content_search_create($form_state, TRUE); // delegate
 }
