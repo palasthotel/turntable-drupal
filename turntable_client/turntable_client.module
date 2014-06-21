@@ -121,6 +121,8 @@ function turntable_client_shared_state_settings() {
 }
 
 function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+
   // get the node's id
   $nid = get_node_id();
 
@@ -128,12 +130,32 @@ function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
     return;
   }
 
-  // form settings
-  $shared_state = (int) $form_state['values']['turntable_client_shared_state'];
+  // get the type of the control element
+  $form_type = $form_state['complete form']['turntable_client_shared_state']['#type'];
+
+  // handle checkbox
+  if ($form_type == 'checkbox') {
+    if ($form_state['values']['turntable_client_shared_state']) {
+      $shared_state = turntable_client::SHARED_ORIG;
+    } else {
+      $shared_state = turntable_client::SHARED_NONE;
+    }
+  } else { // handle dropdown
+    if ($form_state['values']['turntable_client_shared_state']) {
+      $sel = (int) $form_state['values']['turntable_client_shared_state'];
+      if ($sel == 0) {
+        $shared_state = turntable_client::SHARED_COPY;
+      } else {
+        $shared_state = turntable_client::SHARED_REF;
+      }
+    }
+  }
+
   $turntable_client = turntable_client::getInstance();
+  // set the shared state
   $turntable_client->getDB()->setSharedState($nid, $shared_state);
 
-  // post to master
+  // post to master if it is the original
   if ($shared_state === turntable_client::SHARED_ORIG) {
     $node = node_load($nid);
     send_shared_node($turntable_client, $node);
@@ -156,8 +178,6 @@ function send_shared_node($turntable_client, $node) {
   $turntable_client = turntable_client::getInstance();
   $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
   $turntable_client->setClientID($base_url);
-
-  debug($node);
 
   $shared_node = array();
 
