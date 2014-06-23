@@ -91,12 +91,57 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
     $nid = (int) $nid;
 
     $turntable_client = turntable_client::getInstance();
-    $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
+    $db = $turntable_client->getDB();
 
     $shared_node = $turntable_client->getSharedNode($nid);
 
-    debug($shared_node);
+    global $user; // use the current user
 
+    $values = array(
+      'type' => 'article',
+      'uid' => $user->uid,
+      'status' => 0,
+      'comment' => 0,
+      'promote' => 0
+    );
+
+    // create entity and wrapper
+    $local_node = entity_create('node', $values);
+    $ewrapper = entity_metadata_wrapper('node', $local_node);
+
+    // set title,
+    $ewrapper->title->set($shared_node['title']);
+
+    // body
+    $ewrapper->body->set(array(
+      'value' => $shared_node['body']
+    ));
+
+    // save node
+    $ewrapper->save();
+
+    $nid = $local_node->nid;
+
+    $shared_node['nid'] = $nid;
+
+    // set shared state
+    if ($asReference) {
+      $shared_node['shared_state'] = turntable_client::SHARED_REF;
+    } else {
+      $shared_node['shared_state'] = turntable_client::SHARED_COPY;
+    }
+
+    // parse date/time
+    $datetime = DateTime::createFromFormat(DateTime::ISO8601,
+        $shared_node['last_sync']);
+    $shared_node['last_sync'] = $datetime['date'];
+
+    // add shared node to db
+    $res = $db->addSharedNode($shared_node);
+
+    debug($res);
+
+    // messages according to state
     if ($asReference) {
       drupal_set_message(
           t('Successfully imported selected node as a reference.'), 'status');
