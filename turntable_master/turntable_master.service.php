@@ -8,8 +8,6 @@ function turntable_master_save_shared_node($shared_node) {
   // get the id of a possibly existing node
   $nid = $db->getSharedNodeID($shared_node);
 
-  $old_nid = $nid;
-
   if ($nid === FALSE) {
     global $user; // use the current (anonymous) user
 
