@@ -139,7 +139,12 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
     // add shared node to db
     $res = $db->addSharedNode($shared_node);
 
-    debug($res);
+    // show error
+    if ($res !== TRUE) {
+      drupal_set_message(
+          t('Could not import the selected node.'), 'warning');
+      return;
+    }
 
     // messages according to state
     if ($asReference) {
