@@ -192,7 +192,7 @@ function send_shared_node($turntable_client, $node) {
   $shared_node['content_type'] = $node->type;
   $shared_node['user_name'] = $user->name;
   $shared_node['author_name'] = $node->name;
-  $shared_node['last_sync'] = (string) time();
+  $shared_node['last_sync'] = date('Y-m-d\TH:i:sO');
   $shared_node['complete_content'] = json_encode($node);
 
   $response = $turntable_client->sendSharedNode($shared_node);
