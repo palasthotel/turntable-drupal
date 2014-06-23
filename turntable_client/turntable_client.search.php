@@ -102,7 +102,7 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
           t('Successfully imported selected node as a reference.'), 'status');
     } else {
       drupal_set_message(t('Successfully imported selected node as a copy.'),
-          'info');
+          'status');
     }
   }
 }
