@@ -63,6 +63,8 @@ function turntable_master_save_shared_node($shared_node) {
 }
 
 function turntable_master_get_shared_node($nid) {
+  $nid = (int) $nid;
+
   $turntable_master = turntable_master::getInstance();
   $db = $turntable_master->getDB();
 
