@@ -91,6 +91,7 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
     $nid = (int) $nid;
 
     $turntable_client = turntable_client::getInstance();
+    $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
     $db = $turntable_client->getDB();
 
     $shared_node = $turntable_client->getSharedNode($nid);
@@ -110,11 +111,11 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
     $ewrapper = entity_metadata_wrapper('node', $local_node);
 
     // set title,
-    $ewrapper->title->set($shared_node['title']);
+    $ewrapper->title->set($shared_node->title);
 
     // body
     $ewrapper->body->set(array(
-      'value' => $shared_node['body']
+      'value' => $shared_node->body
     ));
 
     // save node
@@ -122,19 +123,18 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
 
     $nid = $local_node->nid;
 
-    $shared_node['nid'] = $nid;
+    $shared_node->nid = $nid;
 
     // set shared state
     if ($asReference) {
-      $shared_node['shared_state'] = turntable_client::SHARED_REF;
+      $shared_node->shared_state = turntable_client::SHARED_REF;
     } else {
-      $shared_node['shared_state'] = turntable_client::SHARED_COPY;
+      $shared_node->shared_state = turntable_client::SHARED_COPY;
     }
 
-    // parse date/time
-    $datetime = DateTime::createFromFormat(DateTime::ISO8601,
-        $shared_node['last_sync']);
-    $shared_node['last_sync'] = $datetime['date'];
+    // parse ISO 8601 date
+    $shared_node->last_sync = DateTime::createFromFormat(DateTime::ISO8601,
+        $shared_node->last_sync);
 
     // add shared node to db
     $res = $db->addSharedNode($shared_node);

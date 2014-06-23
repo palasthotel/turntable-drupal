@@ -164,6 +164,12 @@ function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
 
 function turntable_client_node_presave($node) {
   $turntable_client = turntable_client::getInstance();
+
+  // skip if this node is all new
+  if (!is_int($node->nid)) {
+    return;
+  }
+
   $shared_state = (int) $turntable_client->getDB()->getSharedState($node->nid);
 
   if ($shared_state === turntable_client::SHARED_ORIG) {
