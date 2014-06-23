@@ -66,7 +66,25 @@ function turntable_master_get_shared_node($nid) {
   $turntable_master = turntable_master::getInstance();
   $db = $turntable_master->getDB();
 
-  return $db->getSharedNode($nid);
+  $shared = $db->getSharedNode($nid);
+  $node = node_load($nid);
+
+  $result = array();
+  $result['nid'] = $nid;
+
+  $result['title'] = $node->title;
+  $result['body'] = $node->body[$node->language][0]['value'];
+  $result['language'] = $node->language;
+
+  $result['client_id'] = $shared['client_id'];
+  $result['client_nid'] = $shared['client_nid'];
+  $result['revision_uid'] = $shared['client_vid'];
+  $result['content_type'] = $shared['client_type'];
+  $result['user_name'] = $shared['client_user_name'];
+  $result['author_name'] = $shared['client_author_name'];
+  $result['last_sync'] = date('c', strtotime($shared['last_sync']));
+
+  return $result;
 }
 
 function turntable_master_find_shared_node($query) {
