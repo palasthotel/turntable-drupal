@@ -2,6 +2,8 @@
 require_once './sites/all/libraries/turntable/turntable_client.php';
 
 function turntable_client_content_search($form, &$form_state) {
+  global $base_url;
+
   $form['turntable_client_content_search'] = array(
     '#type' => 'textfield',
     '#title' => t('Turntable Search'),
@@ -24,6 +26,16 @@ function turntable_client_content_search($form, &$form_state) {
     $query = $form_state['values']['turntable_client_content_search'];
 
     $shared_nodes = $turntable_client->findSharedNodes($query);
+
+    // filter shared nodes
+    $filtered = array();
+    // filter out remote nodes with local client id
+    foreach ($shared_nodes as $node) {
+      if ($node->client_id !== $base_url) {
+        $filtered[] = $node;
+      }
+    }
+    $shared_nodes = $filtered;
 
     $rows = array();
 
@@ -141,8 +153,7 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
 
     // show error
     if ($res !== TRUE) {
-      drupal_set_message(
-          t('Could not import the selected node.'), 'warning');
+      drupal_set_message(t('Could not import the selected node.'), 'warning');
       return;
     }
 
