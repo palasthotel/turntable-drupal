@@ -64,6 +64,11 @@ function turntable_client_menu() {
   return $items;
 }
 
+/**
+ * Delete shared node settings when the corresponding local node is deleted.
+ *
+ * @param node $node
+ */
 function turntable_master_node_delete($node) {
   $db = turntable_master::getInstance()->getDB();
 
