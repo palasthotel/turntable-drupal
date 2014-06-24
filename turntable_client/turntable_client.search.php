@@ -4,7 +4,7 @@ require_once './sites/all/libraries/turntable/turntable_client.php';
 function turntable_client_content_search($form, &$form_state) {
   $form['turntable_client_content_search'] = array(
     '#type' => 'textfield',
-    '#title' => t('Search'),
+    '#title' => t('Turntable Search'),
     '#description' => t(
         'Searches all fields that are shared within the node. Terms are space separated.')
   );

@@ -7,8 +7,9 @@ require_once './sites/all/libraries/turntable/core/http.php';
 
 function turntable_client_menu() {
   $items['admin/config/turntable-client'] = array(
-    'title' => 'Turntable Client',
-    'description' => 'Synchronize content between various Drupal installations',
+    'title' => t('Turntable Client'),
+    'description' => t(
+        'Synchronize content between various Drupal installations'),
     'position' => 'right',
     'weight' => -5,
     'page callback' => 'system_admin_menu_block_page',
@@ -20,8 +21,8 @@ function turntable_client_menu() {
   );
 
   $items['admin/config/turntable-client/settings'] = array(
-    'title' => 'Turntable Client settings',
-    'description' => 'Change how Turntable Client behaves.',
+    'title' => t('Turntable Client Settings'),
+    'description' => t('Change how Turntable Client behaves.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array(
       'turntable_client_admin_settings'
@@ -46,8 +47,9 @@ function turntable_client_menu() {
     'file' => 'turntable_client.module'
   );
 
+  // search form
   $items['admin/content/turntable-search'] = array(
-    'title' => t('Turntable'),
+    'title' => t('Turntable Search'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array(
       'turntable_client_content_search'
