@@ -94,11 +94,11 @@ function turntable_client_content_search_submit($form, &$form_state) {
 }
 
 function turntable_client_content_search_create(&$form_state, $asReference) {
+  $form_state['rebuild'] = TRUE;
   $nid = $form_state['values']['results'];
 
   if ($nid === '') {
     drupal_set_message(t('Empty selection.'), 'warning');
-    $form_state['rebuild'] = TRUE;
   } else {
     $nid = (int) $nid;
 
