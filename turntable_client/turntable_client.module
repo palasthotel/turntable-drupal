@@ -140,15 +140,16 @@ function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
     } else {
       $shared_state = turntable_client::SHARED_NONE;
     }
-  } else { // handle dropdown
-    if ($form_state['values']['turntable_client_shared_state']) {
-      $sel = (int) $form_state['values']['turntable_client_shared_state'];
-      if ($sel == 0) {
-        $shared_state = turntable_client::SHARED_COPY;
-      } else {
-        $shared_state = turntable_client::SHARED_REF;
-      }
+  } elseif ($form_state['values']['turntable_client_shared_state']) { // handle dropdown
+    $sel = (int) $form_state['values']['turntable_client_shared_state'];
+    if ($sel == 0) {
+      $shared_state = turntable_client::SHARED_COPY;
+    } else {
+      $shared_state = turntable_client::SHARED_REF;
     }
+  } else {
+    drupal_set_message(t('Invalid form.'), 'error');
+    return;
   }
 
   $turntable_client = turntable_client::getInstance();
