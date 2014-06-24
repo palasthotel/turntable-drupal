@@ -237,38 +237,48 @@ function send_shared_node($turntable_client, $node) {
 function turntable_client_cron() {
   global $base_url;
 
+  // get db connection etc.
   $turntable_client = turntable_client::getInstance();
   $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
   $turntable_client->setClientID($base_url);
   $db = $turntable_client->getDB();
 
+  // update shared nodes
   foreach ($db->getSharedStates() as $shared) {
+    // ignore shared nodes that are not a ref
+    if ($shared['shared_state'] === turntable_client::SHARED_REF) {
+      continue;
+    }
+
     $shared_node = $turntable_client->getSharedNode($shared['master_node_id']);
 
     $local_time = strtotime($shared['last_sync']);
     $remote_time = DateTime::createFromFormat(DateTime::ISO8601,
         $shared_node->last_sync)->getTimestamp();
 
-    if ($remote_time > $local_time) {
-      // update last sync (locally)
-      $db->setSharedLastSync($shared['nid'], $remote_time);
-
-      // load the node
-      $local_node = node_load($shared['nid']);
-
-      $ewrapper = entity_metadata_wrapper('node', $local_node);
-
-      // update and store the node
-      $ewrapper->title->set($shared_node->title);
-
-      // body
-      $ewrapper->body->set(array(
-        'value' => $shared_node->body
-      ));
-
-      // save node
-      $ewrapper->save();
+    // if the remote time is not newer than the local time, stop
+    if ($remote_time <= $local_time) {
+      continue;
     }
+
+    // update last sync (locally)
+    $db->setSharedLastSync($shared['nid'], $remote_time);
+
+    // load the node
+    $local_node = node_load($shared['nid']);
+
+    $ewrapper = entity_metadata_wrapper('node', $local_node);
+
+    // update and store the node
+    $ewrapper->title->set($shared_node->title);
+
+    // body
+    $ewrapper->body->set(array(
+      'value' => $shared_node->body
+    ));
+
+    // save node
+    $ewrapper->save();
   }
 }
 
