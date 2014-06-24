@@ -109,6 +109,17 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
     $shared_node = $turntable_client->getSharedNode($nid);
     $shared_node->master_node_id = $nid;
 
+    $existing_node_id = $db->getSharedNodeID($nid);
+
+    // if the node has not been imported yet, create it
+    if ($existing_node_id !== FALSE) {
+      drupal_set_message(
+          t(
+              'The selected node has already been imported before. ' .
+                   'You might want to change it\'s settings.'), 'warning');
+      return;
+    }
+
     global $user; // use the current user
 
     $values = array(

@@ -70,6 +70,8 @@ function turntable_client_menu() {
  * @param node $node
  */
 function turntable_master_node_delete($node) {
+  debug($node->nid);
+
   $db = turntable_master::getInstance()->getDB();
 
   $db->deleteSharedNode($node->nid);
