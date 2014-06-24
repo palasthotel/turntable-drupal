@@ -64,6 +64,12 @@ function turntable_client_menu() {
   return $items;
 }
 
+function turntable_master_node_delete($node) {
+  $db = turntable_master::getInstance()->getDB();
+
+  $db->deleteSharedNode($node->nid);
+}
+
 function turntable_client_admin_paths_alter(&$paths) {
   $paths['node/*/turntable'] = TRUE;
   $paths['admin/content/turntable-search'] = TRUE;
