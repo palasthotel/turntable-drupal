@@ -107,6 +107,7 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
     $db = $turntable_client->getDB();
 
     $shared_node = $turntable_client->getSharedNode($nid);
+    $shared_node->master_node_id = $nid;
 
     global $user; // use the current user
 
