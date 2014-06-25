@@ -246,7 +246,7 @@ function turntable_client_cron() {
   // update shared nodes
   foreach ($db->getSharedStates() as $shared) {
     // ignore shared nodes that are not a ref
-    if ($shared['shared_state'] === turntable_client::SHARED_REF) {
+    if ($shared['shared_state'] !== turntable_client::SHARED_REF) {
       continue;
     }
 
