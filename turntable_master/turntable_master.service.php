@@ -75,7 +75,6 @@ function turntable_master_get_shared_node($nid) {
   $result['nid'] = $nid;
 
   $result['title'] = $node->title;
-  $result['body'] = $node->body[$node->language][0]['value'];
   $result['language'] = $node->language;
 
   $result['client_id'] = $shared['client_id'];
@@ -85,6 +84,8 @@ function turntable_master_get_shared_node($nid) {
   $result['user_name'] = $shared['client_user_name'];
   $result['author_name'] = $shared['client_author_name'];
   $result['last_sync'] = date('c', strtotime($shared['last_sync']));
+
+  $result['all'] = $node->body[$node->language][0]['value'];
 
   return $result;
 }

@@ -5,6 +5,11 @@ ini_set('display_errors', TRUE);
 require_once './sites/all/libraries/turntable/turntable_client.php';
 require_once './sites/all/libraries/turntable/core/http.php';
 
+/**
+ * Inject menu.
+ *
+ * @return array
+ */
 function turntable_client_menu() {
   $items['admin/config/turntable-client'] = array(
     'title' => t('Turntable Client'),
@@ -75,11 +80,21 @@ function turntable_client_node_delete($node) {
   $db->deleteSharedNode($node->nid);
 }
 
+/**
+ * Enable turntable paths
+ *
+ * @param array $paths
+ */
 function turntable_client_admin_paths_alter(&$paths) {
   $paths['node/*/turntable'] = TRUE;
   $paths['admin/content/turntable-search'] = TRUE;
 }
 
+/**
+ * Returns the ID of the node.
+ *
+ * @return number id of the node
+ */
 function get_node_id() {
   if (!is_numeric(arg(1))) {
     return -1;
@@ -89,9 +104,15 @@ function get_node_id() {
   return (int) arg(1);
 }
 
+/**
+ * Shared state settings.
+ *
+ * @return array form
+ */
 function turntable_client_shared_state_settings() {
   $nid = get_node_id();
 
+  // get the sharing state of the node
   $shared_state = turntable_client::getInstance()->getDB()->getSharedState($nid);
 
   if ($shared_state == turntable_client::SHARED_COPY ||
@@ -133,6 +154,12 @@ function turntable_client_shared_state_settings() {
   return $form;
 }
 
+/**
+ * Handles the submission of sharing settings.
+ *
+ * @param array $form
+ * @param array $form_state
+ */
 function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 
@@ -176,6 +203,11 @@ function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
   }
 }
 
+/**
+ * Handle the saving of a node
+ *
+ * @param array $node
+ */
 function turntable_client_node_presave($node) {
   $turntable_client = turntable_client::getInstance();
 
@@ -191,6 +223,12 @@ function turntable_client_node_presave($node) {
   }
 }
 
+/**
+ * Send a shared node to the master.
+ *
+ * @param array $turntable_client
+ * @param array $node
+ */
 function send_shared_node($turntable_client, $node) {
   global $base_url;
   global $user;
@@ -203,8 +241,9 @@ function send_shared_node($turntable_client, $node) {
 
   // set data
   $shared_node['title'] = $node->title;
-  $shared_node['body'] = $node->body[$node->language][0]['value'];
   $shared_node['language'] = $node->language;
+
+  $shared_node['all'] = json_encode($node);
 
   // set metadata
   $shared_node['node_id'] = $node->nid;
@@ -213,7 +252,6 @@ function send_shared_node($turntable_client, $node) {
   $shared_node['user_name'] = $user->name;
   $shared_node['author_name'] = $node->name;
   $shared_node['last_sync'] = date('c');
-  $shared_node['complete_content'] = json_encode($node);
 
   $response = $turntable_client->sendSharedNode($shared_node);
 
@@ -234,6 +272,9 @@ function send_shared_node($turntable_client, $node) {
   drupal_set_message(t('Settings saved.'));
 }
 
+/**
+ * Client cron job.
+ */
 function turntable_client_cron() {
   global $base_url;
 
@@ -256,7 +297,7 @@ function turntable_client_cron() {
     $remote_time = DateTime::createFromFormat(DateTime::ISO8601,
         $shared_node->last_sync)->getTimestamp();
 
-    // if the remote time is not newer than the local time, stop
+    // if the remote time is not less than the local time, stop
     if ($remote_time <= $local_time) {
       continue;
     }

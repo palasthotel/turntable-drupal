@@ -15,7 +15,32 @@ function turntable_master_schema() {
  */
 function turntable_master_install() {
   $turntable_master = turntable_master::getInstance();
-  $turntable_master->install();
+  $turntable_master->install(); // generic installation
+
+  // drupal specific installation
+  $t = get_t(); // runs in both the installer and runtime
+
+  /* Create and save a new content object */
+  $shared = 'shared'; // machine name of the content type
+
+  // define the node type
+  $shared_node = array(
+    'type' => $slideshow,
+    'name' => $t('Shared'), // Display name of the content type
+    'base' => 'node_content',
+    'title_label' => $t('Title'),
+    'description' => $t('Shared node type used for content sharing'),
+    'custom' => TRUE
+  );
+
+  // set other node defaults not declared above
+  $content_type = node_type_set_defaults($shared_node);
+
+  // add the body field
+  node_add_body_field($content_type, $t('Body'));
+
+  // save the content type
+  node_type_save($content_type);
 }
 
 /**
@@ -24,4 +49,6 @@ function turntable_master_install() {
 function turntable_master_uninstall() {
   $turntable_master = turntable_master::getInstance();
   $turntable_master->uninstall();
+
+  // TODO properly uninstall
 }
