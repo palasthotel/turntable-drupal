@@ -28,16 +28,17 @@ function turntable_master_save_shared_node($shared_node) {
 
     // body
     $ewrapper->body->set(array(
-      'value' => $shared_node['body']
+      'value' => $shared_node['all']
     ));
 
     // save node
     $ewrapper->save();
 
+    // get and store its node id
     $nid = $local_node->nid;
-
     $shared_node['nid'] = $nid;
 
+    // add the shared node to the db table
     return $db->addSharedNode($shared_node);
   } else {
     // load the node
@@ -58,6 +59,7 @@ function turntable_master_save_shared_node($shared_node) {
 
     $shared_node['nid'] = $nid;
 
+    // update the node rather than inserting a new one
     return $db->updateSharedNode($shared_node);
   }
 }
