@@ -249,6 +249,21 @@ function send_shared_node($turntable_client, $node) {
     }
   }
 
+  // create an array of all referenced images with the fid on the client and the
+  // full url of the image
+  $images = array();
+  $ewrapper = entity_metadata_wrapper('node', $node);
+  foreach ($ewrapper->field_image->getIterator() as $i => $image) {
+    if ($image->value() != NULL && $image->value()->uri != NULL) {
+      $fid = $image->value()->fid;
+      $uri = $image->value()->uri;
+      $images[] = array(
+        'fid' => $fid,
+        'uri' => file_create_url($uri)
+      );
+    }
+  }
+
   // set data
   $shared_node['title'] = $node->title;
   $shared_node['language'] = $node->language;
@@ -261,7 +276,10 @@ function send_shared_node($turntable_client, $node) {
   $shared_node['content_type'] = $node->type;
   $shared_node['user_name'] = $user->name;
   $shared_node['author_name'] = $node->name;
+  $shared_node['images'] = json_encode($images);
   $shared_node['last_sync'] = date('c');
+
+  debug($shared_node);
 
   $response = $turntable_client->sendSharedNode($shared_node);
 
@@ -334,7 +352,7 @@ function update_ref($turntable_client, $db, $shared) {
 
   // if the remote time is not less than the local time, stop
   if ($remote_time <= $local_time) {
-    continue;
+    return;
   }
 
   // update last sync (locally)
