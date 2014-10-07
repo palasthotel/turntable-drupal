@@ -93,7 +93,13 @@ function turntable_client_content_search_submit($form, &$form_state) {
   }
 }
 
-function turntable_client_content_search_create(&$form_state, $asReference) {
+/**
+ * Create content (copy or reference).
+ *
+ * @param array $form_state
+ * @param boolean $as_reference
+ */
+function turntable_client_content_search_create(&$form_state, $as_reference) {
   $form_state['rebuild'] = TRUE;
   $nid = $form_state['values']['results'];
 
@@ -111,7 +117,7 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
 
     $existing_node_id = $db->getSharedNodeID($nid);
 
-    // if the node has not been imported yet, create it
+    // check if the node has been imported yet
     if ($existing_node_id !== FALSE) {
       drupal_set_message(
           t(
@@ -120,6 +126,7 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
       return;
     }
 
+    // if the node has not been imported yet, create it
     global $user; // use the current user
 
     $values = array(
@@ -150,7 +157,7 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
     $shared_node->nid = $nid;
 
     // set shared state
-    if ($asReference) {
+    if ($as_reference) {
       $shared_node->shared_state = turntable_client::SHARED_REF;
     } else {
       $shared_node->shared_state = turntable_client::SHARED_COPY;
@@ -170,7 +177,7 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
     }
 
     // messages according to state
-    if ($asReference) {
+    if ($as_reference) {
       drupal_set_message(
           t('Successfully imported selected node as a reference.'), 'status');
     } else {
@@ -180,10 +187,22 @@ function turntable_client_content_search_create(&$form_state, $asReference) {
   }
 }
 
+/**
+ * Copy a shared node from the master.
+ *
+ * @param array $form
+ * @param boolean $form_state
+ */
 function turntable_client_content_search_create_copy($form, &$form_state) {
   turntable_client_content_search_create($form_state, FALSE); // delegate
 }
 
+/**
+ * Reference a shared node from the master.
+ *
+ * @param array $form
+ * @param boolean $form_state
+ */
 function turntable_client_content_search_create_ref($form, &$form_state) {
   turntable_client_content_search_create($form_state, TRUE); // delegate
 }
