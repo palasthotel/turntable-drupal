@@ -92,6 +92,32 @@ function turntable_master_services_resources() {
         ),
         'access arguments append' => TRUE
       )
+    ),
+    'image' => array(
+      'index' => array( // why do I need index? is this a bug?
+        'help' => t('Gets an image from a client'),
+        'file' => array(
+          'file' => 'service.php',
+          'module' => 'turntable_master'
+        ),
+        'callback' => 'turntable_master_get_image',
+        'args' => array(
+          array(
+            'name' => 'url',
+            'type' => 'string',
+            'description' => 'Image URL',
+            'source' => array(
+              'param' => 'url'
+            ),
+            'optional' => FALSE
+          )
+        ),
+        'access callback' => 'turntable_master_access',
+        'access arguments' => array(
+          'read'
+        ),
+        'access arguments append' => TRUE
+      )
     )
   );
 }
@@ -136,16 +162,15 @@ function turntable_master_default_services_endpoint() {
         'create' => array(
           'enabled' => '1'
         ),
-        'read' => array(
+        'retrieve' => array(
           'enabled' => '1'
         )
       )
     ),
-    // this is only a workaround: creating node-shared-search doesn't really
-    // make sense but we need to be able to send data with every request
-    'node-shared-search' => array(
+    // images are readable
+    'image' => array(
       'operations' => array(
-        'create' => array(
+        'retrieve' => array(
           'enabled' => '1'
         )
       )
