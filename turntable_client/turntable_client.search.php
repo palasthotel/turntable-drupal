@@ -109,8 +109,6 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   if ($nid === '') {
     drupal_set_message(t('Empty selection.'), 'warning');
   } else {
-    $available_content_types = get_available_node_content_types();
-
     $nid = (int) $nid;
 
     $turntable_client = turntable_client::getInstance();
@@ -138,13 +136,22 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     // set up the values of this node
     $values = stdToArray(json_decode($shared_node->all));
 
+    // check if the content type is available
+    if (!in_array($values['type'], get_available_node_content_types())) {
+      drupal_set_message(
+          t(
+              'The selected node could not be imported due to incompatible content type.'),
+          'warning');
+      return;
+    }
+
     $images = stdToArray(json_decode($shared_node->images));
 
-    $values['uid'] = $user->uid;
+    $values['uid'] = $user->uid; // current user id
     $values['status'] = 0; // not published
-    $values['comment'] = 0;
-    $values['promote'] = 0;
-    $values['is_new'] = TRUE;
+    $values['comment'] = 0; // disallow commends
+    $values['promote'] = 0; // not promoted
+    $values['is_new'] = TRUE; // new node
 
     foreach ($images as $i => &$img) {
       // download the image
