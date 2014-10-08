@@ -1,6 +1,7 @@
 <?php
 require_once './sites/all/libraries/turntable/turntable_master.php';
 require_once './sites/all/libraries/turntable/core/http.php';
+require_once './sites/all/libraries/turntable/core/util.php';
 
 function turntable_master_save_shared_node($shared_node) {
   $turntable_master = turntable_master::getInstance();
@@ -156,14 +157,4 @@ function turntable_master_get_image($url) {
         'Content-Type' => $info['mime_type'],
         'Content-Length' => $info['file_size']
       ));
-}
-
-function url_to_filename($url) {
-  return str_replace(array(
-    ':',
-    '/'
-  ), array(
-    '_',
-    '_'
-  ), $url);
 }
