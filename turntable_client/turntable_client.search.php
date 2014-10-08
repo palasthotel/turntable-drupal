@@ -2,6 +2,7 @@
 require_once './sites/all/libraries/turntable/turntable_client.php';
 require_once './sites/all/libraries/turntable/core/util.php';
 require_once './sites/all/modules/turntable/common/images.php';
+require_once './sites/all/modules/turntable/common/util.php';
 
 function turntable_client_content_search($form, &$form_state) {
   global $base_url;
@@ -108,6 +109,8 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   if ($nid === '') {
     drupal_set_message(t('Empty selection.'), 'warning');
   } else {
+    $available_content_types = get_available_node_content_types();
+
     $nid = (int) $nid;
 
     $turntable_client = turntable_client::getInstance();
@@ -137,31 +140,40 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 
     $images = stdToArray(json_decode($shared_node->images));
 
-    foreach ($images as $i => &$img) {
-      download_image($img);
-    }
-
     $values['type'] = 'article';
     $values['uid'] = $user->uid;
     $values['status'] = 0; // not published
     $values['comment'] = 0;
     $values['promote'] = 0;
+    $values['is_new'] = TRUE;
 
-    debug($values);
+    foreach ($images as $i => &$img) {
+      // download the image
+      download_image($img);
 
-
-    foreach ($values['field_image'] as $lang => &$img_array) {
-      foreach ($img_array as $i => &$img) {
-        //
+      // replace the remote fid with the local fid
+      foreach ($values['field_image'] as $lang => &$img_array) {
+        foreach ($img_array as $i => &$node_img) {
+          if ($node_img['fid'] === $img['fid']) {
+            $node_img['fid'] = $img['local_fid'];
+          }
+        }
       }
     }
 
-    // create entity and wrapper
+    // remove unneeded attributes
+    unset($values['nid']);
+    unset($values['vid']);
+    unset($values['path']);
+
+    // create entity
     $local_node = entity_create('node', $values);
-    $ewrapper = entity_metadata_wrapper('node', $local_node);
 
     // save node
-    // $ewrapper->save();
+    if (entity_save('node', $local_node) === FALSE) {
+      drupal_set_message(t('Could not import the selected node.'), 'warning');
+      return;
+    }
 
     $nid = $local_node->nid;
 
@@ -179,7 +191,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
         $shared_node->last_sync);
 
     // add shared node to db
-    $res = FALSE; // $db->addSharedNode($shared_node);
+    $res = $db->addSharedNode($shared_node);
 
     // show error
     if ($res === FALSE) {
@@ -222,7 +234,7 @@ function download_image(&$img) {
 
   $info = ensure_image_is_available($dir, $fname, $url);
 
-  debug($info);
+  $img['local_fid'] = $info['fid'];
 }
 
 /**
