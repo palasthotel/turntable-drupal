@@ -314,26 +314,10 @@ function turntable_client_cron() {
 
   // update shared nodes
   foreach ($db->getSharedStates() as $shared) {
-    if ($shared['shared_state'] === turntable_client::SHARED_ORIG) {
-      // if the shared node is an original node, ensure all related files are
-      // uploaded
-      updload_remaining_files($turntable_client, $shared['nid']);
-    } else if ($shared['shared_state'] === turntable_client::SHARED_COPY) {
-      download_remaining_files($turntable_client, $shared['nid']);
-    } else if ($shared['shared_state'] === turntable_client::SHARED_REF) {
+    if ($shared['shared_state'] === turntable_client::SHARED_REF) {
       update_ref($turntable_client, $db, $shared);
-
-      download_remaining_files($turntable_client, $shared['nid']);
     }
   }
-}
-
-/**
- * Uploads the files of a given shared node.
- *
- * @param int $nid
- */
-function updload_remaining_files($turntable_client, $nid) {
 }
 
 /**
@@ -373,13 +357,5 @@ function update_ref($turntable_client, $db, $shared) {
 
   // save node
   $ewrapper->save();
-}
-
-/**
- * Downloads the files of a given shared node.
- *
- * @param int $nid
- */
-function download_remaining_files($turntable_client, $nid) {
 }
 
