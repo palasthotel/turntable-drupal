@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * Ensures that the image at $image_dir_uri . $fname is available. If it is not
+ * available, it is made available by downloading the image from $img_url.
+ *
+ * @param string $image_dir_uri uri of the image directory
+ * @param string $fname name of the image file
+ * @param string $img_url url of the image
+ * @return array finfo including fid
+ */
 function ensure_image_is_available($image_dir_uri, $fname, $img_url) {
   $local_uri = $image_dir_uri . $fname;
 
@@ -13,7 +23,8 @@ function ensure_image_is_available($image_dir_uri, $fname, $img_url) {
     }
 
     // download the file
-    $finfo = system_retrieve_file($img_url, $local_uri, TRUE, FILE_EXISTS_REPLACE);
+    $finfo = system_retrieve_file($img_url, $local_uri, TRUE,
+        FILE_EXISTS_REPLACE);
     if ($finfo === FALSE) {
       return array(
         'error' => 'Could not retrieve the requested file "' . $img_url . '".'
@@ -35,12 +46,19 @@ function ensure_image_is_available($image_dir_uri, $fname, $img_url) {
     $ewrapper->save();
 
     $info = array(
+      'fid' => $finfo['fid'],
       'width' => $img_info[0],
       'height' => $img_info[1],
       'extension' => pathinfo($finfo['filename'], PATHINFO_EXTENSION),
       'mime_type' => $finfo['filemime'],
       'file_size' => $finfo['filesize']
     );
+  } else {
+    $finfo = reset(
+        file_load_multiple(array(), array(
+          'uri' => $local_uri
+        )));
+    $info['fid'] = $finfo->fid;
   }
 
   return $info;
