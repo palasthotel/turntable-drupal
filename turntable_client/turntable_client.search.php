@@ -140,7 +140,6 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 
     $images = stdToArray(json_decode($shared_node->images));
 
-    $values['type'] = 'article';
     $values['uid'] = $user->uid;
     $values['status'] = 0; // not published
     $values['comment'] = 0;
