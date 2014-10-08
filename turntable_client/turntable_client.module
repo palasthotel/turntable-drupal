@@ -242,7 +242,9 @@ function send_shared_node($turntable_client, $node) {
   // set properties of $all
   $all = new stdClass();
   foreach ($node as $key => $value) {
-    if ($key !== 'original' && substr($key, 0, strlen('field_')) !== 'field_') {
+    // ignore some properties
+    if ($key !== 'original' && substr($key, 0, strlen('field_')) !== 'field_' &&
+         substr($key, 0, strlen('form_')) !== 'form_' && $key !== 'rdf_mapping') {
       $all->$key = $value;
     } else if ($key === 'field_image') {
       $all->$key = $value;
@@ -267,8 +269,7 @@ function send_shared_node($turntable_client, $node) {
   // set data
   $shared_node['title'] = $node->title;
   $shared_node['language'] = $node->language;
-
-  $shared_node['all'] = json_encode($all);
+  $shared_node['all'] = json_encode($all); // full content
 
   // set metadata
   $shared_node['node_id'] = $node->nid;
