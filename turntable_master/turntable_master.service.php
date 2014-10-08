@@ -2,6 +2,7 @@
 require_once './sites/all/libraries/turntable/turntable_master.php';
 require_once './sites/all/libraries/turntable/core/http.php';
 require_once './sites/all/libraries/turntable/core/util.php';
+require_once './sites/all/modules/turntable/common/images.php';
 
 function turntable_master_save_shared_node($shared_node) {
   $turntable_master = turntable_master::getInstance();
@@ -108,50 +109,11 @@ function turntable_master_find_shared_node($query) {
 
 function turntable_master_get_image($url) {
   $dir = 'public://field/image/';
-  $uri = $dir . url_to_filename($url);
+  $fname = url_to_filename($url);
 
-  // check if image already exists
-  $info = image_get_info($uri);
-  if ($info === FALSE) {
-    // prepare the directory
-    if (!file_prepare_directory($dir, FILE_CREATE_DIRECTORY)) {
-      return array(
-        'error' => 'Could not create the directory "' . $dir . '".'
-      );
-    }
+  $info = ensure_image_is_available($dir, $fname, $url);
 
-    // download the file
-    $finfo = system_retrieve_file($url, $uri, TRUE, FILE_EXISTS_REPLACE);
-    if ($finfo === FALSE) {
-      return array(
-        'error' => 'Could not retrieve the requested file "' . $url . '".'
-      );
-    }
-
-    $img_info = getimagesize($uri);
-
-    $entity_type = 'image';
-    $entity = entity_create($entity_type, array(
-      ''
-    ));
-
-    // set meta data
-    $ewrapper = entity_metadata_wrapper($entity_type, $entity);
-    $ewrapper->field_image_fid->set($finfo->fid);
-    $ewrapper->field_image_width->set($img_info[0]);
-    $ewrapper->field_image_height->set($img_info[1]);
-    $ewrapper->save();
-
-    $info = array(
-      'width' => $img_info[0],
-      'height' => $img_info[1],
-      'extension' => pathinfo($finfo['filename'], PATHINFO_EXTENSION),
-      'mime_type' => $finfo['filemime'],
-      'file_size' => $finfo['filesize']
-    );
-  }
-
-  // transfer the image
+  // transfer the image to the client
   file_transfer($uri,
       array(
         'Content-Type' => $info['mime_type'],

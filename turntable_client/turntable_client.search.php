@@ -1,5 +1,7 @@
 <?php
 require_once './sites/all/libraries/turntable/turntable_client.php';
+require_once './sites/all/libraries/turntable/core/util.php';
+require_once './sites/all/modules/turntable/common/images.php';
 
 function turntable_client_content_search($form, &$form_state) {
   global $base_url;
@@ -135,7 +137,9 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 
     $images = stdToArray(json_decode($shared_node->images));
 
-    debug($images);
+    foreach ($images as $i => &$img) {
+      download_image($img);
+    }
 
     $values['type'] = 'article';
     $values['uid'] = $user->uid;
@@ -144,6 +148,13 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     $values['promote'] = 0;
 
     debug($values);
+
+
+    foreach ($values['field_image'] as $lang => &$img_array) {
+      foreach ($img_array as $i => &$img) {
+        //
+      }
+    }
 
     // create entity and wrapper
     $local_node = entity_create('node', $values);
@@ -200,6 +211,18 @@ function stdToArray($obj) {
       $field = stdToArray($field);
   }
   return $reaged;
+}
+
+function download_image(&$img) {
+  $dir = 'public://field/image/';
+  $fname = url_to_filename($img['uri']);
+
+  $turntable_client = turntable_client::getInstance();
+  $url = $turntable_client->getImageURL($img['uri']);
+
+  $info = ensure_image_is_available($dir, $fname, $url);
+
+  debug($info);
 }
 
 /**
