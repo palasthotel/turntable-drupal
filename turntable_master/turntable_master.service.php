@@ -10,6 +10,8 @@ function turntable_master_save_shared_node($shared_node) {
   $nid = $db->getSharedNodeID($shared_node);
 
   if ($nid === FALSE) {
+    // new node
+
     global $user; // use the current (anonymous) user
 
     $values = array(
@@ -42,6 +44,8 @@ function turntable_master_save_shared_node($shared_node) {
     // add the shared node to the db table
     return $db->addSharedNode($shared_node);
   } else {
+    // update node
+
     // load the node
     $local_node = node_load($nid);
 
@@ -52,7 +56,7 @@ function turntable_master_save_shared_node($shared_node) {
 
     // body
     $ewrapper->body->set(array(
-      'value' => $shared_node['body']
+      'value' => $shared_node['all']
     ));
 
     // save node
@@ -89,6 +93,7 @@ function turntable_master_get_shared_node($nid) {
   $result['last_sync'] = date('c', strtotime($shared['last_sync']));
 
   $result['all'] = $node->body[$node->language][0]['value'];
+  $result['images'] = $shared['client_images'];
 
   return $result;
 }
