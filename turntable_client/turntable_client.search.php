@@ -112,6 +112,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
     $db = $turntable_client->getDB();
 
+    // get the shared node from master
     $shared_node = $turntable_client->getSharedNode($nid);
     $shared_node->master_node_id = $nid;
 
@@ -121,36 +122,35 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     if ($existing_node_id !== FALSE) {
       drupal_set_message(
           t(
-              'The selected node has already been imported before. ' .
-                   'You might want to change it\'s settings.'), 'warning');
+              'The selected node has already been imported before. You might want to change its settings.'),
+          'warning');
       return;
     }
 
     // if the node has not been imported yet, create it
     global $user; // use the current user
 
-    $values = array(
-      'type' => 'article',
-      'uid' => $user->uid,
-      'status' => 0,
-      'comment' => 0,
-      'promote' => 0
-    );
+    // set up the values of this node
+    $values = stdToArray(json_decode($shared_node->all));
+
+    $images = stdToArray(json_decode($shared_node->images));
+
+    debug($images);
+
+    $values['type'] = 'article';
+    $values['uid'] = $user->uid;
+    $values['status'] = 0; // not published
+    $values['comment'] = 0;
+    $values['promote'] = 0;
+
+    debug($values);
 
     // create entity and wrapper
     $local_node = entity_create('node', $values);
     $ewrapper = entity_metadata_wrapper('node', $local_node);
 
-    // set title,
-    $ewrapper->title->set($shared_node->title);
-
-    // body
-    $ewrapper->body->set(array(
-      'value' => $shared_node->body
-    ));
-
     // save node
-    $ewrapper->save();
+    // $ewrapper->save();
 
     $nid = $local_node->nid;
 
@@ -168,7 +168,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
         $shared_node->last_sync);
 
     // add shared node to db
-    $res = $db->addSharedNode($shared_node);
+    $res = FALSE; // $db->addSharedNode($shared_node);
 
     // show error
     if ($res === FALSE) {
@@ -185,6 +185,21 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
           'status');
     }
   }
+}
+
+/**
+ * Converts a stdClass object to an assoc array.
+ *
+ * @param stdObject $obj
+ * @return array
+ */
+function stdToArray($obj) {
+  $reaged = (array) $obj;
+  foreach ($reaged as $key => &$field) {
+    if (is_object($field) || is_array($field))
+      $field = stdToArray($field);
+  }
+  return $reaged;
 }
 
 /**
