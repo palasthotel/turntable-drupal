@@ -16,13 +16,13 @@ require_once './sites/all/libraries/turntable/turntable_master.php';
  *
  */
 function turntable_master_admin_settings() {
-  $enabled_clients_str = implode(',', $enabled_clients);
+  $client_ids = (array) variable_get('turntable_master_enabled_clients',
+      array());
 
   $form['turntable_master_enabled_clients'] = array(
     '#type' => 'textfield',
     '#title' => t('Enabled client IDs'),
-    '#default_value' => implode(', ',
-        variable_get('turntable_master_enabled_clients', array())),
+    '#default_value' => implode(', ', $client_ids),
     '#description' => t('Comma separated list of IDs of enabled clients.')
   );
 
@@ -33,11 +33,10 @@ function turntable_master_admin_settings() {
 
 function turntable_master_admin_settings_submit(&$form, &$form_state) {
   // set master url
-  $enabled_clients = explode(',',
-      $form_state['values']['turntable_master_enabled_clients']);
-  foreach ($enabled_clients as &$value) {
-    $value = trim($value);
-  }
+  $str = $form_state['values']['turntable_master_enabled_clients'];
+  $enabled_clients = explode(',', $str);
+
+  debug($enabled_clients);
 
   variable_set('turntable_master_enabled_clients', $enabled_clients);
 }
