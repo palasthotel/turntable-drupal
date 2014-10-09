@@ -32,6 +32,8 @@ function turntable_master_menu() {
       'type' => MENU_NORMAL_ITEM,
       'file' => 'turntable_master.settings.php'
   );
+
+  return $items;
 }
 
 function turntable_master_node_delete($node) {
