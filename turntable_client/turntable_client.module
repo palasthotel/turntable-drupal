@@ -312,16 +312,28 @@ function turntable_client_cron() {
   $db = $turntable_client->getDB();
 
   // fetch all nodes
-  $result = db_select('node', 'n')->field('n', array(
-    'nid'
-  ))->execute();
+  $result = db_select('node', 'n')->field('n',
+      array(
+        'nid',
+        'type'
+      ))->execute();
   $default_shared_state = $turntable_client::SHARED_ORIG;
+
+  $default_shared_node_types = variable_get('turntable_client_share_node_types',
+      array(
+        'article',
+        'page'
+      ));
 
   // iterate over nodes
   while ($record = $result->fetchAssoc()) {
     $nid = $record['nid'];
-    // set shared state if it hasn't been set yet
-    $db->setSharedStateIgnoreExisting($nid, $default_shared_state);
+
+    // if the node type is shared by default
+    if (in_array($record['type'], $default_shared_node_types)) {
+      // set shared state if it hasn't been set yet
+      $db->setSharedStateIgnoreExisting($nid, $default_shared_state);
+    }
   }
 
   // update shared nodes
