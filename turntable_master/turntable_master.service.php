@@ -137,8 +137,8 @@ function turntable_master_get_image($url) {
 }
 
 function is_client_enabled() {
-  $enabled_clients = (array) variable_get('turntable_master_enabled_clients',
-      array());
+  $enabled_clients = explode(',',
+      variable_get('turntable_master_enabled_clients', ''));
 
   // get the client id from the http headers
   $client_id = $_SERVER['HTTP_TURNTABLE_CLIENT_ID'];
