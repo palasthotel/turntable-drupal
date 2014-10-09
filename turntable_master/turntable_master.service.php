@@ -8,6 +8,10 @@ function turntable_master_save_shared_node($shared_node) {
   $turntable_master = turntable_master::getInstance();
   $db = $turntable_master->getDB();
 
+  if (!is_client_enabled($db)) {
+    return;
+  }
+
   // get the id of a possibly existing node
   $nid = $db->getSharedNodeID($shared_node);
 
@@ -77,6 +81,10 @@ function turntable_master_get_shared_node($nid) {
   $turntable_master = turntable_master::getInstance();
   $db = $turntable_master->getDB();
 
+  if (!is_client_enabled($db)) {
+    return;
+  }
+
   $shared = $db->getSharedNode($nid);
   $node = node_load($nid);
 
@@ -104,10 +112,18 @@ function turntable_master_find_shared_node($query) {
   $turntable_master = turntable_master::getInstance();
   $db = $turntable_master->getDB();
 
+  // don't check the client id when searching for nodes
+  // helps with debugging
+
   return $db->findSharedNode($query);
 }
 
 function turntable_master_get_image($url) {
+  $turntable_master = turntable_master::getInstance();
+  $db = $turntable_master->getDB();
+  if (!is_client_enabled($db)) {
+    return;
+  }
   $dir = 'public://field/image/';
   $fname = url_to_filename($url);
 
@@ -119,4 +135,11 @@ function turntable_master_get_image($url) {
         'Content-Type' => $info['mime_type'],
         'Content-Length' => $info['file_size']
       ));
+}
+
+function is_client_enabled($db) {
+  $enabled_clients = $db->getEnabledClients();
+  $client_id = drupal_get_http_header('Turntable-Client-ID');
+
+  return in_array($client_id, $enabled_clients);
 }
