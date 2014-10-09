@@ -121,9 +121,11 @@ function turntable_master_find_shared_node($query) {
 function turntable_master_get_image($url) {
   $turntable_master = turntable_master::getInstance();
   $db = $turntable_master->getDB();
+
   if (!is_client_enabled($db)) {
     return;
   }
+
   $dir = 'public://field/image/';
   $fname = url_to_filename($url);
 
@@ -139,7 +141,9 @@ function turntable_master_get_image($url) {
 
 function is_client_enabled($db) {
   $enabled_clients = $db->getEnabledClients();
-  $client_id = drupal_get_http_header('Turntable-Client-ID');
+
+  // get the client id from the http headers
+  $client_id = $_SERVER['HTTP_TURNTABLE_CLIENT_ID'];
 
   return in_array($client_id, $enabled_clients);
 }
