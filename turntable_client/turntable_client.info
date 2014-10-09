@@ -3,6 +3,7 @@ description = Allows users to store nodes to and fetch nodes from the turntable 
 package = Turntable
 version = 0.0.1
 core = 7.x
+dependencies[] = entity
 files[] = turntable_client.module
 files[] = turntable_client.install
 files[] = turntable_client.settings.php
