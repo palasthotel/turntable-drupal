@@ -6,5 +6,6 @@ core = 7.x
 dependencies[] = entity
 files[] = turntable_client.module
 files[] = turntable_client.install
+files[] = turntable_client.search.php
 files[] = turntable_client.settings.php
 configure=admin/config/turntable-client/settings
