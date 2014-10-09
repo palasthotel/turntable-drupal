@@ -35,8 +35,9 @@ function turntable_master_admin_settings_submit(&$form, &$form_state) {
   // set master url
   $str = $form_state['values']['turntable_master_enabled_clients'];
   $enabled_clients = explode(',', $str);
-
-  debug($enabled_clients);
+  foreach ($enabled_clients as &$client_id) {
+    $client_id = trim($client_id);
+  }
 
   variable_set('turntable_master_enabled_clients', $enabled_clients);
 }
