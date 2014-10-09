@@ -14,10 +14,14 @@ function turntable_client_schema() {
  * Implements hook_install().
  */
 function turntable_client_install() {
+  global $base_url;
+
   variable_set('turntable_client_master_url',
       'http://turntable-master.palasthotel.de/');
 
   variable_set('turntable_client_update_interval', 24);
+
+  variable_set('turntable_client_id', $base_url);
 
   $turntable_client = turntable_client::getInstance();
   $turntable_client->install();
