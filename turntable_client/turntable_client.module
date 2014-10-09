@@ -235,7 +235,8 @@ function send_shared_node($turntable_client, $node) {
 
   $turntable_client = turntable_client::getInstance();
   $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
-  $turntable_client->setClientID($base_url);
+  $turntable_client->setClientID(
+      variable_get('turntable_client_id', $base_url));
 
   $shared_node = array();
 
@@ -310,11 +311,14 @@ function turntable_client_cron() {
   // get db connection etc.
   $turntable_client = turntable_client::getInstance();
   $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
-  $turntable_client->setClientID($base_url);
+  $turntable_client->setClientID(
+      variable_get('turntable_client_id', $base_url));
   $db = $turntable_client->getDB();
 
   // fetch all nodes
-  $result = db_select('node', 'n')->field('n', array('nid'))->execute();
+  $result = db_select('node', 'n')->field('n', array(
+    'nid'
+  ))->execute();
   $default_shared_state = $turntable_client::SHARED_ORIG;
 
   // iterate over nodes

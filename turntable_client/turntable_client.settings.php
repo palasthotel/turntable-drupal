@@ -15,6 +15,8 @@
  *
  */
 function turntable_client_admin_settings() {
+  global $base_url;
+
   $form['turntable_client_master_url'] = array(
     '#type' => 'textfield',
     '#title' => t('Turntable Master endpoint URL'),
@@ -33,7 +35,7 @@ function turntable_client_admin_settings() {
   $form['turntable_client_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Turntable Client ID'),
-    '#default_value' => variable_get('turntable_client_id'),
+    '#default_value' => variable_get('turntable_client_id', $base_url),
     '#description' => t('Unique string that is used to identify a Client.')
   );
 

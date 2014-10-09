@@ -99,10 +99,14 @@ function turntable_client_content_search_submit($form, &$form_state) {
 /**
  * Create content (copy or reference).
  *
+ * This means a remote node will be downloaded.
+ *
  * @param array $form_state
  * @param boolean $as_reference
  */
 function turntable_client_content_search_create(&$form_state, $as_reference) {
+  global $base_url;
+
   $form_state['rebuild'] = TRUE;
   $nid = $form_state['values']['results'];
 
@@ -113,6 +117,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 
     $turntable_client = turntable_client::getInstance();
     $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
+    $turntable_client->setClientID(variable_get('turntable_client_id', $base_url));
     $db = $turntable_client->getDB();
 
     // get the shared node from master
