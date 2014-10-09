@@ -30,6 +30,13 @@ function turntable_client_admin_settings() {
         'Number of hours between automatic updates of referenced nodes.')
   );
 
+  $form['turntable_client_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Turntable Client ID'),
+    '#default_value' => variable_get('turntable_client_id'),
+    '#description' => t('Unique string that is used to identify a Client.')
+  );
+
   $form['#submit'][] = 'turntable_client_admin_settings_submit';
 
   return system_settings_form($form);
@@ -43,4 +50,8 @@ function turntable_client_admin_settings_submit(&$form, &$form_state) {
   // set update interval
   variable_set('turntable_client_update_interval',
       $form_state['values']['turntable_client_update_interval']);
+
+  // set client id
+  variable_set('turntable_client_id',
+      $form_state['values']['turntable_client_id']);
 }

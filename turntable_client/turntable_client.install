@@ -33,6 +33,8 @@ function turntable_client_install() {
 function turntable_client_uninstall() {
   // delete master url variable
   variable_del('turntable_client_master_url');
+  variable_del('turntable_client_update_interval');
+  variable_del('turntable_client_id');
 
   $turntable_client = turntable_client::getInstance();
   $turntable_client->uninstall();
