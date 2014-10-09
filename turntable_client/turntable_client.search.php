@@ -134,7 +134,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     global $user; // use the current user
 
     // set up the values of this node
-    $values = stdToArray(json_decode($shared_node->all));
+    $values = std_to_array(json_decode($shared_node->all));
 
     // check if the content type is available
     if (!in_array($values['type'], get_available_node_content_types())) {
@@ -145,7 +145,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
       return;
     }
 
-    $images = stdToArray(json_decode($shared_node->images));
+    $images = std_to_array(json_decode($shared_node->images));
 
     $values['uid'] = $user->uid; // current user id
     $values['status'] = 0; // not published
@@ -219,14 +219,14 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 /**
  * Converts a stdClass object to an assoc array.
  *
- * @param stdObject $obj
+ * @param stdClass $obj
  * @return array
  */
-function stdToArray($obj) {
+function std_to_array($obj) {
   $reaged = (array) $obj;
   foreach ($reaged as $key => &$field) {
     if (is_object($field) || is_array($field))
-      $field = stdToArray($field);
+      $field = std_to_array($field);
   }
   return $reaged;
 }
