@@ -21,15 +21,6 @@ function turntable_client_install() {
 
   $turntable_client = turntable_client::getInstance();
   $turntable_client->install();
-  $db = $turntable_client->getDB();
-
-  $result = db_select('node', 'n')->field('n', array('nid'))->execute();
-  $default_shared_state = $turntable_client::SHARED_ORIG;
-
-  while ($record = $result->fetchAssoc()) {
-    $nid = $record['nid'];
-    $db->setSharedStateIgnoreExisting($nid, $default_shared_state);
-  }
 }
 
 /**

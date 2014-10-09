@@ -313,6 +313,17 @@ function turntable_client_cron() {
   $turntable_client->setClientID($base_url);
   $db = $turntable_client->getDB();
 
+  // fetch all nodes
+  $result = db_select('node', 'n')->field('n', array('nid'))->execute();
+  $default_shared_state = $turntable_client::SHARED_ORIG;
+
+  // iterate over nodes
+  while ($record = $result->fetchAssoc()) {
+    $nid = $record['nid'];
+    // set shared state if it hasn't been set yet
+    $db->setSharedStateIgnoreExisting($nid, $default_shared_state);
+  }
+
   // update shared nodes
   foreach ($db->getSharedStates() as $shared) {
     if ($shared['shared_state'] === turntable_client::SHARED_REF) {
