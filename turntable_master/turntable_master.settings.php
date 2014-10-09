@@ -1,4 +1,5 @@
 <?php
+require_once './sites/all/libraries/turntable/turntable_client.php';
 
 /**
  * @file
@@ -7,7 +8,7 @@
 
 /**
  * Form builder.
- * Configure turntable client.
+ * Configure turntable master.
  *
  * @ingroup forms
  *
@@ -15,32 +16,33 @@
  *
  */
 function turntable_master_admin_settings() {
+  $tt_client = turntable_client::getInstance();
+  $db = $tt_client->getDB();
+  $enabled_clients = $db->getEnabledClients();
+  $enabled_clients_str = implode(',', $enabled_clients);
+
   $form['turntable_master_enabled_clients'] = array(
     '#type' => 'textfield',
-    '#title' => t('Turntable Master endpoint URL'),
-    '#default_value' => variable_get('turntable_master_allowed_clients'),
-    '#description' => t('The URL of the linked Turntable Master instance.')
+    '#title' => t('Enabled client IDs'),
+    '#default_value' => $enabled_clients_str,
+    '#description' => t('Comma separated list of IDs for enabled clients.')
   );
 
-  $form['turntable_client_update_interval'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Turntable update interval'),
-    '#default_value' => variable_get('turntable_client_update_interval'),
-    '#description' => t(
-        'Number of hours between automatic updates of referenced nodes.')
-  );
-
-  $form['#submit'][] = 'turntable_client_admin_settings_submit';
+  $form['#submit'][] = 'turntable_master_admin_settings_submit';
 
   return system_settings_form($form);
 }
 
-function turntable_client_admin_settings_submit(&$form, &$form_state) {
-  // set master url
-  variable_set('turntable_client_master_url',
-      $form_state['values']['turntable_client_master_url']);
+function turntable_master_admin_settings_submit(&$form, &$form_state) {
+  $tt_client = turntable_client::getInstance();
+  $db = $tt_client->getDB();
 
-  // set update interval
-  variable_set('turntable_client_update_interval',
-      $form_state['values']['turntable_client_update_interval']);
+  // set master url
+  $enabled_clients = explode(',',
+      $form_state['values']['turntable_master_enabled_clients']);
+  foreach ($enabled_clients as &$value) {
+    $value = trim($value);
+  }
+
+  $db->setEnabledClients($enabled_clients);
 }
