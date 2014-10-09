@@ -1,5 +1,5 @@
 <?php
-require_once './sites/all/libraries/turntable/turntable_client.php';
+require_once './sites/all/libraries/turntable/turntable_master.php';
 
 /**
  * @file
@@ -16,8 +16,8 @@ require_once './sites/all/libraries/turntable/turntable_client.php';
  *
  */
 function turntable_master_admin_settings() {
-  $tt_client = turntable_client::getInstance();
-  $db = $tt_client->getDB();
+  $tt_master = turntable_master::getInstance();
+  $db = $tt_master->getDB();
   $enabled_clients = $db->getEnabledClients();
   $enabled_clients_str = implode(',', $enabled_clients);
 
@@ -25,7 +25,7 @@ function turntable_master_admin_settings() {
     '#type' => 'textfield',
     '#title' => t('Enabled client IDs'),
     '#default_value' => $enabled_clients_str,
-    '#description' => t('Comma separated list of IDs for enabled clients.')
+    '#description' => t('Comma separated list of IDs of enabled clients.')
   );
 
   $form['#submit'][] = 'turntable_master_admin_settings_submit';
@@ -34,8 +34,8 @@ function turntable_master_admin_settings() {
 }
 
 function turntable_master_admin_settings_submit(&$form, &$form_state) {
-  $tt_client = turntable_client::getInstance();
-  $db = $tt_client->getDB();
+  $tt_master = turntable_master::getInstance();
+  $db = $tt_master->getDB();
 
   // set master url
   $enabled_clients = explode(',',
@@ -45,6 +45,6 @@ function turntable_master_admin_settings_submit(&$form, &$form_state) {
   }
 
   if (!$db->setEnabledClients($enabled_clients)) {
-    drupal_message('error', t('Could not set the enabled client IDs.'));
+    drupal_set_message(t('Could not set the enabled client IDs.'), 'error');
   }
 }
