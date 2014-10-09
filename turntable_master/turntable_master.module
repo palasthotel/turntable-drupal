@@ -4,6 +4,36 @@ ini_set('display_errors', TRUE);
 
 require_once './sites/all/libraries/turntable/turntable_master.php';
 
+function turntable_master_menu() {
+  $items['admin/config/turntable-master'] = array(
+      'title' => t('Turntable Master'),
+      'description' => t(
+          'Synchronize content between various Drupal installations'),
+      'position' => 'right',
+      'weight' => -5,
+      'page callback' => 'system_admin_menu_block_page',
+      'access arguments' => array(
+          'administer site configuration'
+      ),
+      'file' => 'system.admin.inc',
+      'file path' => drupal_get_path('module', 'system')
+  );
+
+  $items['admin/config/turntable-master/settings'] = array(
+      'title' => t('Turntable Master Settings'),
+      'description' => t('Change how Turntable Master behaves.'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array(
+          'turntable_master_admin_settings'
+      ),
+      'access arguments' => array(
+          'administer site configuration'
+      ),
+      'type' => MENU_NORMAL_ITEM,
+      'file' => 'turntable_master.settings.php'
+  );
+}
+
 function turntable_master_node_delete($node) {
   $db = turntable_master::getInstance()->getDB();
 

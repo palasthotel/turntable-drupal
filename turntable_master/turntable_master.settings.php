@@ -44,5 +44,7 @@ function turntable_master_admin_settings_submit(&$form, &$form_state) {
     $value = trim($value);
   }
 
-  $db->setEnabledClients($enabled_clients);
+  if (!$db->setEnabledClients($enabled_clients)) {
+    drupal_message('error', t('Could not set the enabled client IDs.'));
+  }
 }
