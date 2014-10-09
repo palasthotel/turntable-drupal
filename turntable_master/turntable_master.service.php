@@ -5,12 +5,12 @@ require_once './sites/all/libraries/turntable/core/util.php';
 require_once './sites/all/modules/turntable/common/images.php';
 
 function turntable_master_save_shared_node($shared_node) {
-  $turntable_master = turntable_master::getInstance();
-  $db = $turntable_master->getDB();
-
-  if (!is_client_enabled($db)) {
+  if (!is_client_enabled()) {
     return;
   }
+
+  $turntable_master = turntable_master::getInstance();
+  $db = $turntable_master->getDB();
 
   // get the id of a possibly existing node
   $nid = $db->getSharedNodeID($shared_node);
@@ -76,14 +76,14 @@ function turntable_master_save_shared_node($shared_node) {
 }
 
 function turntable_master_get_shared_node($nid) {
+  if (!is_client_enabled()) {
+    return;
+  }
+
   $nid = (int) $nid;
 
   $turntable_master = turntable_master::getInstance();
   $db = $turntable_master->getDB();
-
-  if (!is_client_enabled($db)) {
-    return;
-  }
 
   $shared = $db->getSharedNode($nid);
   $node = node_load($nid);
@@ -119,10 +119,7 @@ function turntable_master_find_shared_node($query) {
 }
 
 function turntable_master_get_image($url) {
-  $turntable_master = turntable_master::getInstance();
-  $db = $turntable_master->getDB();
-
-  if (!is_client_enabled($db)) {
+  if (!is_client_enabled()) {
     return;
   }
 
@@ -139,8 +136,8 @@ function turntable_master_get_image($url) {
       ));
 }
 
-function is_client_enabled($db) {
-  $enabled_clients = $db->getEnabledClients();
+function is_client_enabled() {
+  $enabled_clients = variable_get('turntable_master_enabled_clients', array());
 
   // get the client id from the http headers
   $client_id = $_SERVER['HTTP_TURNTABLE_CLIENT_ID'];
