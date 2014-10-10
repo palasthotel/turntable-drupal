@@ -46,12 +46,12 @@ function ensure_image_is_available($image_dir_uri, $fname, $img_url) {
     $ewrapper->save();
 
     $info = array(
-      'fid' => $finfo['fid'],
+      'fid' => $finfo->fid,
       'width' => $img_info[0],
       'height' => $img_info[1],
-      'extension' => pathinfo($finfo['filename'], PATHINFO_EXTENSION),
-      'mime_type' => $finfo['filemime'],
-      'file_size' => $finfo['filesize']
+      'extension' => pathinfo($finfo->filename, PATHINFO_EXTENSION),
+      'mime_type' => $finfo->filemime,
+      'file_size' => $finfo->filesize
     );
   } else {
     $finfo = reset(
