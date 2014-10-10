@@ -355,12 +355,14 @@ function turntable_client_cron() {
     // if the node type is shared by default
     if (in_array($record['type'], $default_shared_node_types)) {
       // set shared state if it hasn't been set yet
-      $db->setSharedStateIgnoreExisting($nid, $default_shared_state);
+      if ($db->getSharedState($nid) === FALSE) {
+        $db->setSharedState($nid, $default_shared_state);
 
-      // send shared node to master
-      if ($default_shared_state === turntable_client::SHARED_ORIG) {
-        $node = node_load($nid);
-        send_shared_node($turntable_client, $node);
+        if ($default_shared_state === turntable_client::SHARED_ORIG) {
+          // send shared node to master
+          $node = node_load($nid);
+          send_shared_node($turntable_client, $node);
+        }
       }
     }
   }
