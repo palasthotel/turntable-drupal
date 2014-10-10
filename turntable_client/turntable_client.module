@@ -352,8 +352,6 @@ function turntable_client_cron() {
   while ($record = $result->fetchAssoc()) {
     $nid = $record['nid'];
 
-    echo $nid . ': ' . $db->getSharedState($nid) . "\n";
-
     // if the node type is shared by default
     if (in_array($record['type'], $default_shared_node_types)) {
       // set shared state if it hasn't been set yet
