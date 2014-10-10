@@ -319,7 +319,7 @@ function send_shared_node($turntable_client, $node) {
     }
   }
 
-  drupal_set_message(t('Settings saved.'));
+  drupal_set_message(t('Shared the node with Turntable Master.'));
 }
 
 /**
