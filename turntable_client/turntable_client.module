@@ -251,6 +251,7 @@ function turntable_client_node_presave($node) {
  *
  * @param array $turntable_client
  * @param array $node
+ * @return boolean
  */
 function send_shared_node($turntable_client, $node) {
   global $base_url;
@@ -279,13 +280,18 @@ function send_shared_node($turntable_client, $node) {
   $images = array();
   $ewrapper = entity_metadata_wrapper('node', $node);
   foreach ($ewrapper->field_image->getIterator() as $i => $image) {
-    if ($image && is_object($image->value()) && $image->value()->uri != NULL) {
-      $fid = $image->value()->fid;
-      $uri = $image->value()->uri;
-      $images[] = array(
-        'fid' => $fid,
-        'uri' => file_create_url($uri)
-      );
+    try { // catch exceptions (temporary workaround)
+      if ($image
+          && is_object($image->value())
+          && $image->value()->uri != NULL) {
+        $fid = $image->value()->fid;
+        $uri = $image->value()->uri;
+        $images[] = array(
+          'fid' => $fid,
+          'uri' => file_create_url($uri)
+        );
+      }
+    } catch(Exception $e) {
     }
   }
 
@@ -309,17 +315,19 @@ function send_shared_node($turntable_client, $node) {
   if (!$response) {
     drupal_set_message(t('Turntable Master could not process the request.'),
         'warning');
-    return;
+    return FALSE;
   } else {
     $decoded = json_decode($response);
     if (!$decoded[0]) {
       drupal_set_message(t('Turntable Master did not accept the request.'),
           'warning');
-      return;
+      return FALSE;
     }
   }
 
+  $turntable_client->getDB()->setSharedLastSync($node->nid, time());
   drupal_set_message(t('Shared the node with Turntable Master.'));
+  return TRUE;
 }
 
 /**
@@ -357,12 +365,14 @@ function turntable_client_cron() {
       // set shared state if it hasn't been set yet
       if ($db->getSharedState($nid) === -1) {
         $db->setSharedState($nid, $default_shared_state);
-
-        // send shared node to master
-        $node = node_load($nid);
-        send_shared_node($turntable_client, $node);
       }
     }
+  }
+
+  foreach ($db->getRemainingSharedNodes() as $nid) {
+    // send remaining shared nodes to master
+    $node = node_load($nid);
+    send_shared_node($turntable_client, $node);
   }
 
   // update shared nodes
