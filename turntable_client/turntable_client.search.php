@@ -117,7 +117,8 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 
     $turntable_client = turntable_client::getInstance();
     $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
-    $turntable_client->setClientID(variable_get('turntable_client_id', $base_url));
+    $turntable_client->setClientID(
+        variable_get('turntable_client_id', $base_url));
     $db = $turntable_client->getDB();
 
     // get the shared node from master
@@ -160,15 +161,20 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 
     foreach ($images as $i => &$img) {
       // download the image
-      download_image($img);
+      $downloaded = download_image($img);
 
-      // replace the remote fid with the local fid
-      foreach ($values['field_image'] as $lang => &$img_array) {
-        foreach ($img_array as $i => &$node_img) {
-          if ($node_img['fid'] === $img['fid']) {
-            $node_img['fid'] = $img['local_fid'];
+      if ($downloaded) {
+        // replace the remote fid with the local fid
+        foreach ($values['field_image'] as $lang => &$img_array) {
+          foreach ($img_array as $i => &$node_img) {
+            if ($node_img['fid'] === $img['fid']) {
+              $node_img['fid'] = $img['local_fid'];
+            }
           }
         }
+      } else {
+        drupal_set_message(t('Could not download an image.'), 'warning');
+        return;
       }
     }
 
@@ -245,7 +251,12 @@ function download_image(&$img) {
 
   $info = ensure_image_is_available($dir, $fname, $url);
 
-  $img['local_fid'] = $info['fid'];
+  if (isset($info['fid'])) {
+    $img['local_fid'] = $info['fid'];
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }
 
 /**
