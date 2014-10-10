@@ -312,7 +312,7 @@ function turntable_client_cron() {
   $db = $turntable_client->getDB();
 
   // fetch all nodes
-  $result = db_select('node', 'n')->field('n',
+  $result = db_select('node', 'n')->fields('n',
       array(
         'nid',
         'type'
