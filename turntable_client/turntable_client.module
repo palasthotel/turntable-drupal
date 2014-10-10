@@ -216,10 +216,33 @@ function turntable_client_node_presave($node) {
     return;
   }
 
-  $shared_state = (int) $turntable_client->getDB()->getSharedState($node->nid);
+  $shared_state = $turntable_client->getDB()->getSharedState($node->nid);
 
   if ($shared_state === turntable_client::SHARED_ORIG) {
+    // if this node is set to SHARED_ORIG
+    // send it to the master
     send_shared_node($turntable_client, $node);
+  } else if ($shared_state === -1) {
+    // if the node's shared state has not yet been set
+    $default_shared_node_types = variable_get(
+        'turntable_client_share_node_types',
+        array(
+          'article',
+          'page'
+        ));
+
+    if (in_array($node->type, $default_shared_node_types)) {
+      // if its type is among the node types that are shared by default,
+      // set its state to SHARED_ORIG
+      $turntable_client->getDB()->setSharedState($node->nid,
+          turntable_client::SHARED_ORIG);
+      // and send it to the master
+      send_shared_node($turntable_client, $node);
+    } else {
+      // otherwise set its state to SHARED_NONE
+      $turntable_client->getDB()->setSharedState($node->nid,
+          turntable_client::SHARED_NONE);
+    }
   }
 }
 
