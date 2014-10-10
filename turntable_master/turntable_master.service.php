@@ -119,12 +119,14 @@ function turntable_master_find_shared_node($query) {
 }
 
 function turntable_master_get_image($url) {
-  if (!is_client_enabled()) {
-    return;
-  }
-
+  // Don't check for valid client id's in image service
+  // unable to set the correct http header in request
+  // if (!is_client_enabled()) {
+  // return;
+  // }
   $dir = 'public://field/image/';
   $fname = url_to_filename($url);
+  $uri = $dir . $fname;
 
   $info = ensure_image_is_available($dir, $fname, $url);
 
