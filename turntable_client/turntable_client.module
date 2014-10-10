@@ -358,11 +358,9 @@ function turntable_client_cron() {
       if ($db->getSharedState($nid) === -1) {
         $db->setSharedState($nid, $default_shared_state);
 
-        if ($default_shared_state === turntable_client::SHARED_ORIG) {
-          // send shared node to master
-          $node = node_load($nid);
-          send_shared_node($turntable_client, $node);
-        }
+        // send shared node to master
+        $node = node_load($nid);
+        send_shared_node($turntable_client, $node);
       }
     }
   }
