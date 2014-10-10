@@ -279,9 +279,7 @@ function send_shared_node($turntable_client, $node) {
   $images = array();
   $ewrapper = entity_metadata_wrapper('node', $node);
   foreach ($ewrapper->field_image->getIterator() as $i => $image) {
-    if ($image
-        && is_object($image->value())
-        && $image->value()->uri != NULL) {
+    if ($image && is_object($image->value()) && $image->value()->uri != NULL) {
       $fid = $image->value()->fid;
       $uri = $image->value()->uri;
       $images[] = array(
@@ -342,7 +340,7 @@ function turntable_client_cron() {
         'nid',
         'type'
       ))->execute();
-  $default_shared_state = $turntable_client::SHARED_ORIG;
+  $default_shared_state = turntable_client::SHARED_ORIG;
 
   $default_shared_node_types = variable_get('turntable_client_share_node_types',
       array(
@@ -360,7 +358,10 @@ function turntable_client_cron() {
       $db->setSharedStateIgnoreExisting($nid, $default_shared_state);
 
       // send shared node to master
-      send_shared_node($turntable_client, $record['nid']);
+      if ($default_shared_state === turntable_client::SHARED_ORIG) {
+        $node = node_load($nid);
+        send_shared_node($turntable_client, $node);
+      }
     }
   }
 
