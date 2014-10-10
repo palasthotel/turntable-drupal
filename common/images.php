@@ -34,9 +34,7 @@ function ensure_image_is_available($image_dir_uri, $fname, $img_url) {
     $img_info = getimagesize($local_uri);
 
     $entity_type = 'image';
-    $entity = entity_create($entity_type, array(
-      ''
-    ));
+    $entity = entity_create($entity_type);
 
     // set meta data
     $ewrapper = entity_metadata_wrapper($entity_type, $entity);
