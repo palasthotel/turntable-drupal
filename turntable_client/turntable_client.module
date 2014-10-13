@@ -281,9 +281,7 @@ function send_shared_node($turntable_client, $node) {
   $ewrapper = entity_metadata_wrapper('node', $node);
   foreach ($ewrapper->field_image->getIterator() as $i => $image) {
     try { // catch exceptions (temporary workaround)
-      if ($image
-          && is_object($image->value())
-          && $image->value()->uri != NULL) {
+      if ($image && is_object($image->value()) && $image->value()->uri != NULL) {
         $fid = $image->value()->fid;
         $uri = $image->value()->uri;
         $images[] = array(
@@ -291,7 +289,7 @@ function send_shared_node($turntable_client, $node) {
           'uri' => file_create_url($uri)
         );
       }
-    } catch(Exception $e) {
+    } catch (Exception $e) {
     }
   }
 
@@ -304,7 +302,13 @@ function send_shared_node($turntable_client, $node) {
   $shared_node['node_id'] = $node->nid;
   $shared_node['revision_uid'] = $node->revision_uid;
   $shared_node['content_type'] = $node->type;
-  $shared_node['user_name'] = $user->name;
+
+  if (isset($user->name)) {
+    $shared_node['user_name'] = $user->name;
+  } else {
+    $shared_node['user_name'] = 'cron';
+  }
+
   $shared_node['author_name'] = $node->name;
   $shared_node['images'] = json_encode($images);
   $shared_node['last_sync'] = date('c');
