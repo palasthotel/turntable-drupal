@@ -128,7 +128,7 @@ function turntable_master_get_image($url) {
   $fname = url_to_filename($url);
   $uri = $dir . $fname;
 
-  $info = ensure_image_is_available($dir, $fname, $url);
+  $info = ensure_image_is_available($dir, $fname, $url, FALSE);
 
   // transfer the image to the client
   file_transfer($uri,

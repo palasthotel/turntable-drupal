@@ -9,7 +9,8 @@
  * @param string $img_url url of the image
  * @return array finfo including fid
  */
-function ensure_image_is_available($image_dir_uri, $fname, $img_url) {
+function ensure_image_is_available($image_dir_uri, $fname, $img_url,
+    $add_to_db = TRUE) {
   $local_uri = $image_dir_uri . $fname;
 
   // check if image already exists
@@ -33,15 +34,17 @@ function ensure_image_is_available($image_dir_uri, $fname, $img_url) {
 
     $img_info = getimagesize($local_uri);
 
-    $entity_type = 'image';
-    $entity = entity_create($entity_type);
+    if ($add_to_db) {
+      $entity_type = 'image';
+      $entity = entity_create($entity_type);
 
-    // set meta data
-    $ewrapper = entity_metadata_wrapper($entity_type, $entity);
-    $ewrapper->field_image_fid->set($finfo->fid);
-    $ewrapper->field_image_width->set($img_info[0]);
-    $ewrapper->field_image_height->set($img_info[1]);
-    $ewrapper->save();
+      // set meta data
+      $ewrapper = entity_metadata_wrapper($entity_type, $entity);
+      $ewrapper->field_image_fid->set($finfo->fid);
+      $ewrapper->field_image_width->set($img_info[0]);
+      $ewrapper->field_image_height->set($img_info[1]);
+      $ewrapper->save();
+    }
 
     $info = array(
       'fid' => $finfo->fid,
