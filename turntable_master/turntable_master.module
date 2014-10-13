@@ -224,3 +224,21 @@ function turntable_master_access($op, $args) {
   return TRUE;
 }
 
+function turntable_master_cron() {
+  $image_dir = 'public://field/image/';
+
+  if (!file_exists($image_dir)) {
+    return;
+  }
+
+  // remove image files
+  $handle = opendir($imagedir);
+  while (($file = readdir($handle)) !== FALSE) {
+    if (is_file($file)) {
+      unlink($file);
+    }
+  }
+
+  closedir($handle);
+}
+
