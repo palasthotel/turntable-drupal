@@ -6,31 +6,31 @@ require_once './sites/all/libraries/turntable/turntable_master.php';
 
 function turntable_master_menu() {
   $items['admin/config/turntable-master'] = array(
-      'title' => t('Turntable Master'),
-      'description' => t(
-          'Synchronize content between various Drupal installations'),
-      'position' => 'right',
-      'weight' => -5,
-      'page callback' => 'system_admin_menu_block_page',
-      'access arguments' => array(
-          'administer site configuration'
-      ),
-      'file' => 'system.admin.inc',
-      'file path' => drupal_get_path('module', 'system')
+    'title' => t('Turntable Master'),
+    'description' => t(
+        'Synchronize content between various Drupal installations'),
+    'position' => 'right',
+    'weight' => -5,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array(
+      'administer site configuration'
+    ),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system')
   );
 
   $items['admin/config/turntable-master/settings'] = array(
-      'title' => t('Turntable Master Settings'),
-      'description' => t('Change how Turntable Master behaves.'),
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array(
-          'turntable_master_admin_settings'
-      ),
-      'access arguments' => array(
-          'administer site configuration'
-      ),
-      'type' => MENU_NORMAL_ITEM,
-      'file' => 'turntable_master.settings.php'
+    'title' => t('Turntable Master Settings'),
+    'description' => t('Change how Turntable Master behaves.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'turntable_master_admin_settings'
+    ),
+    'access arguments' => array(
+      'administer site configuration'
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'turntable_master.settings.php'
   );
 
   return $items;
@@ -232,10 +232,11 @@ function turntable_master_cron() {
   }
 
   // remove image files
-  $handle = opendir($imagedir);
+  $handle = opendir($image_dir);
   while (($file = readdir($handle)) !== FALSE) {
-    if (is_file($file)) {
-      unlink($file);
+    $file_uri = $image_dir . $file;
+    if (is_file($file_uri)) {
+      unlink($file_uri);
     }
   }
 
