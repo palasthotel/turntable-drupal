@@ -25,7 +25,7 @@ function turntable_master_install() {
 
   // define the node type
   $shared_node = array(
-    'type' => $slideshow,
+    'type' => $shared,
     'name' => $t('Shared'), // Display name of the content type
     'base' => 'node_content',
     'title_label' => $t('Title'),
