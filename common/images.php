@@ -24,7 +24,7 @@ function ensure_image_is_available($image_dir_uri, $fname, $img_url,
     }
 
     // download the file
-    $finfo = system_retrieve_file($img_url, $local_uri, TRUE,
+    $finfo = system_retrieve_file($img_url, $local_uri, FALSE,
         FILE_EXISTS_REPLACE);
     if ($finfo === FALSE) {
       return array(
