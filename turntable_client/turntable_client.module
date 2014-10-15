@@ -370,16 +370,18 @@ function turntable_client_cron() {
         'page'
       ));
 
-  print_r($default_shared_node_types);
+  $shared_node_types = array();
+  foreach ($default_shared_node_types as $key => $value) {
+    if (is_string($value)) {
+      $shared_node_types[] = $value;
+    }
+  }
 
   // iterate over nodes
   while ($record = $result->fetchAssoc()) {
     $nid = $record['nid'];
-
     // if the node type is shared by default
-    if (in_array($record['type'], $default_shared_node_types) &&
-         isset($default_shared_node_types[$record['type']]) &&
-         $default_shared_node_types[$record['type']] != 0) {
+    if (in_array($record['type'], $shared_node_types)) {
       // set shared state if it hasn't been set yet
       if ($db->getSharedState($nid) === -1) {
         $db->setSharedState($nid, $default_shared_state);
