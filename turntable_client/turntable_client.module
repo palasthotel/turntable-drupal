@@ -4,7 +4,9 @@ ini_set('display_errors', TRUE);
 
 require_once './sites/all/libraries/turntable/turntable_client.php';
 require_once './sites/all/libraries/turntable/core/http.php';
+require_once './sites/all/libraries/turntable/drupal/images.php';
 require_once './sites/all/libraries/turntable/drupal/util.php';
+
 
 /**
  * Inject menu.
