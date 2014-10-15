@@ -425,20 +425,59 @@ function update_ref($turntable_client, $db, $shared) {
   // update last sync (locally)
   $db->setSharedLastSync($shared['nid'], $remote_time);
 
-  // load the node
-  $local_node = node_load($shared['nid']);
+  // decode the node
+  $values = std_to_array(json_decode($shared_node->all));
 
-  $ewrapper = entity_metadata_wrapper('node', $local_node);
+  // check if the content type is available
+  if (!in_array($values['type'], get_available_node_content_types())) {
+    drupal_set_message(
+    t(
+    'The selected node could not be imported due to incompatible content type.'),
+    'warning');
+    return;
+  }
 
-  // update and store the node
-  $ewrapper->title->set($shared_node->title);
+  $images = std_to_array(json_decode($shared_node->images));
 
-  // body
-  $ewrapper->body->set(array(
-    'value' => $shared_node->body
-  ));
+  $values['uid'] = $user->uid; // current user id
+  $values['status'] = 0; // not published
+  $values['comment'] = 0; // disallow commends
+  $values['promote'] = 0; // not promoted
+  $values['is_new'] = TRUE; // new node
+
+  foreach ($images as $i => &$img) {
+    // download the image
+    $downloaded = download_image($img);
+
+    if ($downloaded) {
+      // replace the remote fid with the local fid
+      foreach ($values['field_image'] as $lang => &$img_array) {
+        foreach ($img_array as $i => &$node_img) {
+          if ($node_img['fid'] === $img['fid']) {
+            $node_img['fid'] = $img['local_fid'];
+          }
+        }
+      }
+    } else {
+      drupal_set_message(t('Could not download an image.'), 'warning');
+      return;
+    }
+  }
+
+  // remove unneeded attributes
+  unset($values['vid']);
+  unset($values['path']);
+
+  // set nid
+  $values['nid'] = $shared['nid'];
+  $local_node = entity_create('node', $values);
 
   // save node
-  $ewrapper->save();
+  if (entity_save('node', $local_node) === FALSE) {
+    drupal_set_message(t('Could not import the selected node.'), 'warning');
+    return;
+  }
+
+
 }
 
