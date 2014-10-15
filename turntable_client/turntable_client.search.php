@@ -33,9 +33,11 @@ function turntable_client_content_search($form, &$form_state) {
     // filter shared nodes
     $filtered = array();
     // filter out remote nodes with local client id
-    foreach ($shared_nodes as $node) {
-      if ($node->client_id !== $base_url) {
-        $filtered[] = $node;
+    if (is_array($shared_nodes)) {
+      foreach ($shared_nodes as $node) {
+        if ($node->client_id !== $base_url) {
+          $filtered[] = $node;
+        }
       }
     }
     $shared_nodes = $filtered;
