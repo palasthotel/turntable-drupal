@@ -230,38 +230,6 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 }
 
 /**
- * Converts a stdClass object to an assoc array.
- *
- * @param stdClass $obj
- * @return array
- */
-function std_to_array($obj) {
-  $reaged = (array) $obj;
-  foreach ($reaged as $key => &$field) {
-    if (is_object($field) || is_array($field))
-      $field = std_to_array($field);
-  }
-  return $reaged;
-}
-
-function download_image(&$img) {
-  $dir = 'public://field/image/';
-  $fname = url_to_filename($img['uri']);
-
-  $turntable_client = turntable_client::getInstance();
-  $url = $turntable_client->getImageURL($img['uri']);
-
-  $info = ensure_image_is_available($dir, $fname, $url);
-
-  if (isset($info['fid'])) {
-    $img['local_fid'] = $info['fid'];
-    return TRUE;
-  } else {
-    return FALSE;
-  }
-}
-
-/**
  * Copy a shared node from the master.
  *
  * @param array $form

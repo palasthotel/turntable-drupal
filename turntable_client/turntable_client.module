@@ -480,36 +480,3 @@ function update_ref($turntable_client, $db, $shared) {
     return;
   }
 }
-
-/**
- * Converts a stdClass object to an assoc array.
- *
- * @param stdClass $obj
- * @return array
- */
-function std_to_array($obj) {
-  $reaged = (array) $obj;
-  foreach ($reaged as $key => &$field) {
-    if (is_object($field) || is_array($field))
-      $field = std_to_array($field);
-  }
-  return $reaged;
-}
-
-function download_image(&$img) {
-  $dir = 'public://field/image/';
-  $fname = url_to_filename($img['uri']);
-
-  $turntable_client = turntable_client::getInstance();
-  $url = $turntable_client->getImageURL($img['uri']);
-
-  $info = ensure_image_is_available($dir, $fname, $url);
-
-  if (isset($info['fid'])) {
-    $img['local_fid'] = $info['fid'];
-    return TRUE;
-  } else {
-    return FALSE;
-  }
-}
-
