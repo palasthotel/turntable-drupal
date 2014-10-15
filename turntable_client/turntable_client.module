@@ -4,6 +4,7 @@ ini_set('display_errors', TRUE);
 
 require_once './sites/all/libraries/turntable/turntable_client.php';
 require_once './sites/all/libraries/turntable/core/http.php';
+require_once './sites/all/libraries/turntable/drupal/util.php';
 
 /**
  * Inject menu.
@@ -431,19 +432,21 @@ function update_ref($turntable_client, $db, $shared) {
   // check if the content type is available
   if (!in_array($values['type'], get_available_node_content_types())) {
     drupal_set_message(
-    t(
-    'The selected node could not be imported due to incompatible content type.'),
-    'warning');
+        t(
+            'The selected node could not be imported due to incompatible content type.'),
+        'warning');
     return;
   }
 
   $images = std_to_array(json_decode($shared_node->images));
 
-  $values['uid'] = $user->uid; // current user id
-  $values['status'] = 0; // not published
-  $values['comment'] = 0; // disallow commends
-  $values['promote'] = 0; // not promoted
-  $values['is_new'] = TRUE; // new node
+  $old_node = node_load($shared['nid']);
+
+  // use settings from old node
+  $values['uid'] = $old_node->uid;
+  $values['status'] = $old_node->status;
+  $values['comment'] = $old_node->comment;
+  $values['promote'] = $old_node->promote;
 
   foreach ($images as $i => &$img) {
     // download the image
@@ -477,7 +480,37 @@ function update_ref($turntable_client, $db, $shared) {
     drupal_set_message(t('Could not import the selected node.'), 'warning');
     return;
   }
+}
 
+/**
+ * Converts a stdClass object to an assoc array.
+ *
+ * @param stdClass $obj
+ * @return array
+ */
+function std_to_array($obj) {
+  $reaged = (array) $obj;
+  foreach ($reaged as $key => &$field) {
+    if (is_object($field) || is_array($field))
+      $field = std_to_array($field);
+  }
+  return $reaged;
+}
 
+function download_image(&$img) {
+  $dir = 'public://field/image/';
+  $fname = url_to_filename($img['uri']);
+
+  $turntable_client = turntable_client::getInstance();
+  $url = $turntable_client->getImageURL($img['uri']);
+
+  $info = ensure_image_is_available($dir, $fname, $url);
+
+  if (isset($info['fid'])) {
+    $img['local_fid'] = $info['fid'];
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }
 
