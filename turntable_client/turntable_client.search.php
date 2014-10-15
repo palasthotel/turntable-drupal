@@ -1,8 +1,8 @@
 <?php
 require_once './sites/all/libraries/turntable/turntable_client.php';
 require_once './sites/all/libraries/turntable/core/util.php';
-require_once './sites/all/modules/turntable/common/images.php';
-require_once './sites/all/modules/turntable/common/util.php';
+require_once './sites/all/libraries/turntable/drupal/images.php';
+require_once './sites/all/libraries/turntable/drupal/util.php';
 
 function turntable_client_content_search($form, &$form_state) {
   global $base_url;

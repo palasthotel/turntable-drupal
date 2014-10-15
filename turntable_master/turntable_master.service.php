@@ -2,7 +2,7 @@
 require_once './sites/all/libraries/turntable/turntable_master.php';
 require_once './sites/all/libraries/turntable/core/http.php';
 require_once './sites/all/libraries/turntable/core/util.php';
-require_once './sites/all/modules/turntable/common/images.php';
+require_once './sites/all/libraries/turntable/drupal/images.php';
 
 function turntable_master_save_shared_node($shared_node) {
   if (!is_client_enabled()) {
