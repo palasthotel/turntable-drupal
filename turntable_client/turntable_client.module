@@ -440,14 +440,6 @@ function update_ref($turntable_client, $db, $shared) {
 
   $images = std_to_array(json_decode($shared_node->images));
 
-  $old_node = node_load($shared['nid']);
-
-  // use settings from old node
-  $values['uid'] = $old_node->uid;
-  $values['status'] = $old_node->status;
-  $values['comment'] = $old_node->comment;
-  $values['promote'] = $old_node->promote;
-
   foreach ($images as $i => &$img) {
     // download the image
     $downloaded = download_image($img);
@@ -467,8 +459,15 @@ function update_ref($turntable_client, $db, $shared) {
     }
   }
 
-  // remove unneeded attributes
-  unset($values['vid']);
+
+  $old_node = node_load($shared['nid']);
+
+  // use settings from old node
+  $values['uid'] = $old_node->uid;
+  $values['status'] = $old_node->status;
+  $values['comment'] = $old_node->comment;
+  $values['promote'] = $old_node->promote;
+  $values['vid'] = $old_node->vid;
   unset($values['path']);
 
   // set nid
