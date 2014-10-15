@@ -353,6 +353,8 @@ function turntable_client_cron() {
   $turntable_client->setClientID(variable_get('turntable_client_id', $base_url));
   $db = $turntable_client->getDB();
 
+  $limit = variable_get('turntable_client_cron_sharing_limit', 100);
+
   // fetch all nodes
   $result = db_select('node', 'n')->fields('n',
       array(
@@ -380,7 +382,7 @@ function turntable_client_cron() {
     }
   }
 
-  foreach ($db->getRemainingSharedNodes() as $nid) {
+  foreach ($db->getRemainingSharedNodes($limit) as $nid) {
     // send remaining shared nodes to master
     $node = node_load($nid);
     send_shared_node($turntable_client, $node);
