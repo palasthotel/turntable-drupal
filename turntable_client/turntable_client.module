@@ -344,6 +344,22 @@ function send_shared_node($turntable_client, $node) {
   return TRUE;
 }
 
+function classify_field($field, $field_properties, &$is_list, &$type,
+    &$inner_type) {
+  // is this field a list field?
+  $is_list = isset($field_properties['type']) &&
+       strpos($field_properties['type'], 'list<') === 0;
+
+  if ($is_list) {
+    // in case of list, get the inner type
+    $type = $field_properties['type'];
+    // unwrap type
+    $inner_type = str_replace('>', '', str_replace('list<', '', $type));
+  } else {
+    $type = isset($field_properties['type']) ? $field_properties['type'] : FALSE;
+  }
+}
+
 function sanitize_fields_find_image_refs(&$node) {
   $ewrapper = entity_metadata_wrapper('node', $node);
   $info = $ewrapper->getPropertyInfo();
@@ -361,26 +377,19 @@ function sanitize_fields_find_image_refs(&$node) {
 
   // walk fields
   foreach ($info as $field => $field_properties) {
-    // is this field a list field?
-    $is_list = isset($field_properties['type']) &&
-         strpos($field_properties['type'], 'list<') === 0;
-
-    $type = null;
+    $is_list = FALSE;
+    $type = NULL;
     $inner_type = FALSE;
 
-    if ($is_list) {
-      // in case of list, get the inner type
-      $type = $field_properties['type'];
-      // unwrap type
-      $inner_type = str_replace('>', '', str_replace('list<', '', $type));
+    // classify the field
+    classify_field($field, $field_properties, $is_list, $type, $inner_type);
 
+    if ($is_list) {
       // if the inner type is a ref type, unset the field
       if (in_array($inner_type, $ref_types)) {
         unset($node->$field);
       }
     } else {
-      $type = isset($field_properties['type']) ? $field_properties['type'] : FALSE;
-
       // if the type is a ref type, unset the field
       if (in_array($type, $ref_types)) {
         unset($node->$field);
@@ -570,18 +579,69 @@ function update_ref($turntable_client, $db, $shared) {
   $values['nid'] = $shared['nid'];
   $local_node = entity_create('node', $values);
   $ewrapper = entity_metadata_wrapper('node', $local_node);
+  $info = $ewrapper->getPropertyInfo();
 
   //
   // download required images and replace original image fids with local fids
   //
-  $images = std_to_array(json_decode($shared_node->images));
+  $image_refs = std_to_array(json_decode($shared_node->images));
+
+  // walk fields
+  foreach ($info as $field => $field_properties) {
+    $is_list = FALSE;
+    $type = NULL;
+    $inner_type = FALSE;
+
+    // classify the field
+    classify_field($field, $field_properties, $is_list, $type, $inner_type);
+
+    if ($type === 'field_item_image') {
+      // check if the field is an image
+
+      // get fid and uri/url of single image refs
+      $image = $ewrapper->$field->value();
+      $fid = $image['fid'];
+
+      // track if something changed
+      $change = FALSE;
+
+      // find a relevant image_ref, then download the image and replace the fid
+      foreach ($image_refs as $image_ref) {
+        if ($fid == $image_ref['fid']) {
+          $img_info = download_image($image_ref['uri']);
+          if ($img_info !== FALSE) {
+            $image['fid'] = $img_info['fid'];
+            $image['uri'] = $img_info['uri'];
+          }
+        }
+      }
+
+      if ($change) {
+        // if something changed, save the changes
+        $ewrapper->$field->set($image);
+      }
+    } else if ($inner_type === 'field_item_image') {
+      // check if the field is a list of images
+
+      // get fid and uri/url of multiple image refs
+      $images = $ewrapper->$field->value();
+      foreach ($images as &$image) {
+        $fid = $image['fid'];
+        $url = get_image_url($image);
+        $image_refs[] = array(
+          'fid' => $fid,
+          'uri' => $url
+        );
+      }
+    }
+  }
 
   foreach ($images as $i => &$img) {
     // download the image
     if (download_image($img)) {
       // replace the remote fid with the local fid
       foreach ($values['field_image'] as $lang => &$img_array) {
-        foreach ($img_array as $i => &$node_img) {
+        foreach ($img_array as &$node_img) {
           if ($node_img['fid'] === $img['fid']) {
             $node_img['fid'] = $img['local_fid'];
           }
