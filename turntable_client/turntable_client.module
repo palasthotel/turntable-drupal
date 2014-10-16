@@ -395,13 +395,25 @@ function sanitize_fields_find_image_refs(&$node) {
     }
 
     if ($type === 'field_item_image') {
-      debug($ewrapper->$field[0]);
-      // debug($image->fid . ': ' . $image->uri);
+      // get fid and uri/url of single image refs
+      $image = $ewrapper->$field->value();
+      $fid = $image['fid'];
+      $url = get_image_url($image);
+      $image_refs[] = array(
+        'fid' => $fid,
+        'uri' => $url
+      );
     } else if ($inner_type === 'field_item_image') {
-      // debug(print_r($ewrapper->$field));
-      // foreach ($ewrapper->$field as $i => $image) {
-      // debug($image->fid . ': ' . $image->uri);
-      // }
+      // get fid and uri/url of multiple image refs
+      $images = $ewrapper->$field->value();
+      foreach ($images as $i => $image) {
+        $fid = $image['fid'];
+        $url = get_image_url($image);
+        $image_refs[] = array(
+          'fid' => $fid,
+          'uri' => $url
+        );
+      }
     }
   }
 
@@ -409,6 +421,7 @@ function sanitize_fields_find_image_refs(&$node) {
   unset($node->original);
 
   // remove comment related information
+  unset($node->comment);
   unset($node->comment_count);
   unset($node->comment_count_new);
   unset($node->last_comment_timestamp);
@@ -416,7 +429,6 @@ function sanitize_fields_find_image_refs(&$node) {
   unset($node->last_comment_uid);
 
   // remove additional fields
-  unset($node->name);
   unset($node->picture);
   unset($node->data);
   unset($node->form_id);
@@ -434,6 +446,17 @@ function sanitize_fields_find_image_refs(&$node) {
   debug($node);
 
   return $image_refs;
+}
+
+function get_image_url($image) {
+  if (isset($image['uri'])) {
+    $uri = $image['uri'];
+  } else {
+    $file = file_load($image['fid']);
+    $uri = $file->uri;
+  }
+
+  return file_create_url($uri);
 }
 
 /**
