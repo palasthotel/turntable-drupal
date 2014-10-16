@@ -417,6 +417,9 @@ function sanitize_fields_find_image_refs(&$node) {
     }
   }
 
+  // the following fields are special and only make sense in a local drupal
+  // instance, thus they are removed before uploading
+
   // remove original
   unset($node->original);
 
@@ -554,13 +557,28 @@ function update_ref($turntable_client, $db, $shared) {
     return;
   }
 
+  $old_node = node_load($shared['nid']);
+
+  // use settings from old node
+  $values['uid'] = $old_node->uid;
+  $values['status'] = $old_node->status;
+  $values['comment'] = $old_node->comment;
+  $values['promote'] = $old_node->promote;
+  $values['vid'] = $old_node->vid;
+
+  // set nid
+  $values['nid'] = $shared['nid'];
+  $local_node = entity_create('node', $values);
+  $ewrapper = entity_metadata_wrapper('node', $local_node);
+
+  //
+  // download required images and replace original image fids with local fids
+  //
   $images = std_to_array(json_decode($shared_node->images));
 
   foreach ($images as $i => &$img) {
     // download the image
-    $downloaded = download_image($img);
-
-    if ($downloaded) {
+    if (download_image($img)) {
       // replace the remote fid with the local fid
       foreach ($values['field_image'] as $lang => &$img_array) {
         foreach ($img_array as $i => &$node_img) {
@@ -574,20 +592,6 @@ function update_ref($turntable_client, $db, $shared) {
       return;
     }
   }
-
-  $old_node = node_load($shared['nid']);
-
-  // use settings from old node
-  $values['uid'] = $old_node->uid;
-  $values['status'] = $old_node->status;
-  $values['comment'] = $old_node->comment;
-  $values['promote'] = $old_node->promote;
-  $values['vid'] = $old_node->vid;
-  unset($values['path']);
-
-  // set nid
-  $values['nid'] = $shared['nid'];
-  $local_node = entity_create('node', $values);
 
   // save node
   if (entity_save('node', $local_node) === FALSE) {
