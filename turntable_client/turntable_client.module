@@ -7,7 +7,6 @@ require_once './sites/all/libraries/turntable/core/http.php';
 require_once './sites/all/libraries/turntable/drupal/images.php';
 require_once './sites/all/libraries/turntable/drupal/util.php';
 
-
 /**
  * Inject menu.
  *
@@ -286,23 +285,23 @@ function send_shared_node($turntable_client, $node) {
 
   // create an array of all referenced images with the fid on the client and the
   // full url of the image
-  $images = array();
-  $ewrapper = entity_metadata_wrapper('node', $node);
-  if (isset($ewrapper->field_image)) {
-    foreach ($ewrapper->field_image->getIterator() as $i => $image) {
-      try { // catch exceptions (temporary workaround)
-        if ($image && is_object($image->value()) && $image->value()->uri != NULL) {
-          $fid = $image->value()->fid;
-          $uri = $image->value()->uri;
-          $images[] = array(
-            'fid' => $fid,
-            'uri' => file_create_url($uri)
-          );
-        }
-      } catch (Exception $e) {
-      }
-    }
-  }
+  $image_refs = sanitize_fields_find_image_refs($node);
+
+  // if (isset($ewrapper->field_image)) {
+  // foreach ($ewrapper->field_image->getIterator() as $i => $image) {
+  // try { // catch exceptions (temporary workaround)
+  // if ($image && is_object($image->value()) && $image->value()->uri != NULL) {
+  // $fid = $image->value()->fid;
+  // $uri = $image->value()->uri;
+  // $images[] = array(
+  // 'fid' => $fid,
+  // 'uri' => file_create_url($uri)
+  // );
+  // }
+  // } catch (Exception $e) {
+  // }
+  // }
+  // }
 
   // set data
   $shared_node['title'] = $node->title;
@@ -321,7 +320,7 @@ function send_shared_node($turntable_client, $node) {
   }
 
   $shared_node['author_name'] = $node->name;
-  $shared_node['images'] = json_encode($images);
+  $shared_node['images'] = json_encode($image_refs);
   $shared_node['last_sync'] = date('c');
 
   $response = $turntable_client->sendSharedNode($shared_node);
@@ -343,6 +342,98 @@ function send_shared_node($turntable_client, $node) {
   $turntable_client->getDB()->setSharedLastSync($node->nid, time());
   drupal_set_message(t('Shared the node with Turntable Master.'));
   return TRUE;
+}
+
+function sanitize_fields_find_image_refs(&$node) {
+  $ewrapper = entity_metadata_wrapper('node', $node);
+  $info = $ewrapper->getPropertyInfo();
+
+  $image_refs = array();
+  $ref_types = array(
+    'node',
+    'comment',
+    'file',
+    'field_item_file',
+    'user',
+    'taxonomy_term',
+    'taxomomy_vocabulary'
+  );
+
+  // walk fields
+  foreach ($info as $field => $field_properties) {
+    // is this field a list field?
+    $is_list = isset($field_properties['type']) &&
+         strpos($field_properties['type'], 'list<') === 0;
+
+    $type = null;
+    $inner_type = FALSE;
+
+    if ($is_list) {
+      // in case of list, get the inner type
+      $type = $field_properties['type'];
+      // unwrap type
+      $inner_type = str_replace('>', '', str_replace('list<', '', $type));
+
+      // if the inner type is a ref type, unset the field
+      if (in_array($inner_type, $ref_types)) {
+        unset($node->$field);
+      }
+    } else {
+      $type = isset($field_properties['type']) ? $field_properties['type'] : FALSE;
+
+      // if the type is a ref type, unset the field
+      if (in_array($type, $ref_types)) {
+        unset($node->$field);
+      }
+    }
+
+    if ($type === FALSE && !(isset($field_properties['required']) &&
+         $field_properties['required'] === TRUE)) {
+      // check for title, comment_count etc.
+      // only required fields will be kept
+      unset($node->$field);
+    }
+
+    if ($type === 'field_item_image') {
+      debug($ewrapper->$field[0]);
+      // debug($image->fid . ': ' . $image->uri);
+    } else if ($inner_type === 'field_item_image') {
+      // debug(print_r($ewrapper->$field));
+      // foreach ($ewrapper->$field as $i => $image) {
+      // debug($image->fid . ': ' . $image->uri);
+      // }
+    }
+  }
+
+  // remove original
+  unset($node->original);
+
+  // remove comment related information
+  unset($node->comment_count);
+  unset($node->comment_count_new);
+  unset($node->last_comment_timestamp);
+  unset($node->last_comment_name);
+  unset($node->last_comment_uid);
+
+  // remove additional fields
+  unset($node->name);
+  unset($node->picture);
+  unset($node->data);
+  unset($node->form_id);
+  unset($node->form_token);
+  unset($node->form_build_id);
+  unset($node->additional_settings__active_tab);
+  unset($node->menu);
+  unset($node->path);
+  unset($node->submit);
+  unset($node->preview);
+  unset($node->delete);
+  unset($node->op);
+  unset($node->rdf_mapping);
+
+  debug($node);
+
+  return $image_refs;
 }
 
 /**
@@ -460,7 +551,6 @@ function update_ref($turntable_client, $db, $shared) {
       return;
     }
   }
-
 
   $old_node = node_load($shared['nid']);
 
