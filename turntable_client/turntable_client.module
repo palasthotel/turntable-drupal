@@ -460,17 +460,6 @@ function sanitize_fields_find_image_refs(&$node) {
   return $image_refs;
 }
 
-function get_image_url($image) {
-  if (isset($image['uri'])) {
-    $uri = $image['uri'];
-  } else {
-    $file = file_load($image['fid']);
-    $uri = $file->uri;
-  }
-
-  return file_create_url($uri);
-}
-
 /**
  * Client cron job.
  */
@@ -594,28 +583,23 @@ function update_ref($turntable_client, $db, $shared) {
 
     // classify the field
     classify_field($field, $field_properties, $is_list, $type, $inner_type);
-
     if ($type === 'field_item_image') {
       // check if the field is an image
-
       // get fid and uri/url of single image refs
       $image = $ewrapper->$field->value();
-      $fid = $image['fid'];
-
       // track if something changed
       $change = FALSE;
-
       // find a relevant image_ref, then download the image and replace the fid
       foreach ($image_refs as $image_ref) {
-        if ($fid == $image_ref['fid']) {
-          $img_info = download_image($image_ref['uri']);
-          if ($img_info !== FALSE) {
-            $image['fid'] = $img_info['fid'];
-            $image['uri'] = $img_info['uri'];
+        if ($image['fid'] == $image_ref['fid']) {
+          $new_img = download_image($image_ref['uri']);
+          if ($new_img !== FALSE) {
+            $image['fid'] = $new_img['fid'];
+            $image['uri'] = $new_img['uri'];
+            $change = TRUE;
           }
         }
       }
-
       if ($change) {
         // if something changed, save the changes
         $ewrapper->$field->set($image);
@@ -623,39 +607,36 @@ function update_ref($turntable_client, $db, $shared) {
     } else if ($inner_type === 'field_item_image') {
       // check if the field is a list of images
 
-      // get fid and uri/url of multiple image refs
-      $images = $ewrapper->$field->value();
-      foreach ($images as &$image) {
-        $fid = $image['fid'];
-        $url = get_image_url($image);
-        $image_refs[] = array(
-          'fid' => $fid,
-          'uri' => $url
-        );
-      }
-    }
-  }
+      // track if something changed
+      $change = FALSE;
 
-  foreach ($images as $i => &$img) {
-    // download the image
-    if (download_image($img)) {
-      // replace the remote fid with the local fid
-      foreach ($values['field_image'] as $lang => &$img_array) {
-        foreach ($img_array as &$node_img) {
-          if ($node_img['fid'] === $img['fid']) {
-            $node_img['fid'] = $img['local_fid'];
+      $images = $ewrapper->$field->value();
+
+      foreach ($images as &$image) {
+        // find a relevant image_ref, then download the image and replace the fid
+        foreach ($image_refs as $image_ref) {
+          if ($image['fid'] == $image_ref['fid']) {
+            $new_img = download_image($image_ref['uri']);
+            if ($new_img !== FALSE) {
+              $image['fid'] = $new_img['fid'];
+              $image['uri'] = $new_img['uri'];
+              $change = TRUE;
+            } else {
+              // don't show this warning, since we're in cron
+              // drupal_set_message(t('Could not download an image.'), 'warning');
+              return;
+            }
           }
         }
       }
-    } else {
-      drupal_set_message(t('Could not download an image.'), 'warning');
-      return;
+
+      if ($change) {
+        // if something changed, save the changes
+        $ewrapper->$field->set($images);
+      }
     }
   }
 
   // save node
-  if (entity_save('node', $local_node) === FALSE) {
-    drupal_set_message(t('Could not import the selected node.'), 'warning');
-    return;
-  }
+  $ewrapper->save();
 }
