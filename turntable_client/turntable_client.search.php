@@ -114,122 +114,105 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
 
   if ($nid === '') {
     drupal_set_message(t('Empty selection.'), 'warning');
-  } else {
-    $nid = (int) $nid;
-
-    $turntable_client = turntable_client::getInstance();
-    $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
-    $turntable_client->setClientID(
-        variable_get('turntable_client_id', $base_url));
-    $db = $turntable_client->getDB();
-
-    // get the shared node from master
-    $shared_node = $turntable_client->getSharedNode($nid);
-    $shared_node->master_node_id = $nid;
-
-    $existing_node_id = $db->getSharedNodeID($nid);
-
-    // check if the node has been imported yet
-    if ($existing_node_id !== FALSE) {
-      drupal_set_message(
-          t(
-              'The selected node has already been imported before. You might want to change its settings.'),
-          'warning');
-      return;
-    }
-
-    // if the node has not been imported yet, create it
-    global $user; // use the current user
-
-    // set up the values of this node
-    $values = std_to_array(json_decode($shared_node->all));
-
-    // check if the content type is available
-    if (!in_array($values['type'], get_available_node_content_types())) {
-      drupal_set_message(
-          t(
-              'The selected node could not be imported due to incompatible content type.'),
-          'warning');
-      return;
-    }
-
-    $images = std_to_array(json_decode($shared_node->images));
-
-    $values['uid'] = $user->uid; // current user id
-    $values['status'] = 0; // not published
-    $values['comment'] = 0; // disallow commends
-    $values['promote'] = 0; // not promoted
-    $values['is_new'] = TRUE; // new node
-
-    foreach ($images as $i => &$img) {
-      // download the image
-      $downloaded = download_image($img);
-
-      if ($downloaded) {
-        // replace the remote fid with the local fid
-        foreach ($values['field_image'] as $lang => &$img_array) {
-          foreach ($img_array as $i => &$node_img) {
-            if ($node_img['fid'] === $img['fid']) {
-              $node_img['fid'] = $img['local_fid'];
-            }
-          }
-        }
-      } else {
-        drupal_set_message(t('Could not download an image.'), 'warning');
-        return;
-      }
-    }
-
-    // remove unneeded attributes
-    unset($values['nid']);
-    unset($values['vid']);
-    unset($values['path']);
-
-    // create entity
-    $local_node = entity_create('node', $values);
-
-    // save node
-    if (entity_save('node', $local_node) === FALSE) {
-      drupal_set_message(t('Could not import the selected node.'), 'warning');
-      return;
-    }
-
-    $nid = $local_node->nid;
-
-    $shared_node->nid = $nid;
-
-    // set shared state
-    if ($as_reference) {
-      $shared_node->shared_state = turntable_client::SHARED_REF;
-    } else {
-      $shared_node->shared_state = turntable_client::SHARED_COPY;
-    }
-
-    // parse ISO 8601 date
-    $shared_node->last_sync = DateTime::createFromFormat(DateTime::ISO8601,
-        $shared_node->last_sync);
-
-    // add shared node to db
-    $res = $db->addSharedNode($shared_node);
-
-    // show error
-    if ($res === FALSE) {
-      drupal_set_message(t('Could not import the selected node.'), 'warning');
-      return;
-    }
-
-    // messages according to state
-    if ($as_reference) {
-      drupal_set_message(
-          t('Successfully imported selected node as a reference.'), 'status');
-    } else {
-      drupal_set_message(t('Successfully imported selected node as a copy.'),
-          'status');
-    }
-
-    // redirect the user to the newly created node
-    drupal_goto("node/$nid/edit");
+    return;
   }
+
+  $nid = (int) $nid;
+
+  $turntable_client = turntable_client::getInstance();
+  $turntable_client->setMasterURL(variable_get('turntable_client_master_url'));
+  $turntable_client->setClientID(variable_get('turntable_client_id', $base_url));
+  $db = $turntable_client->getDB();
+
+  // get the shared node from master
+  $shared_node = $turntable_client->getSharedNode($nid);
+  $shared_node->master_node_id = $nid;
+
+  $existing_node_id = $db->getSharedNodeID($nid);
+
+  // check if the node has been imported yet
+  if ($existing_node_id !== FALSE) {
+    drupal_set_message(
+        t(
+            'The selected node has already been imported before. You might want to change its settings.'),
+        'warning');
+    return;
+  }
+
+  // if the node has not been imported yet, create it
+  global $user; // use the current user
+
+  // set up the values of this node
+  $values = std_to_array(json_decode($shared_node->all));
+
+  // check if the content type is available
+  if (!in_array($values['type'], get_available_node_content_types())) {
+    drupal_set_message(
+        t(
+            'The selected node could not be imported due to incompatible content type.'),
+        'warning');
+    return;
+  }
+
+  // remove some attributes
+  unset($values['nid']);
+  unset($values['vid']);
+  unset($values['path']);
+
+  // create entity
+  $local_node = entity_create('node', $values);
+  $ewrapper = entity_metadata_wrapper('node', $local_node);
+  $image_refs = std_to_array(json_decode($shared_node->images));
+
+  if (!resolve_image_references($ewrapper, $image_refs, TRUE)) {
+    drupal_set_message(t('Could not import the selected node.'), 'warning');
+    return;
+  }
+
+  $ewrapper->uid->set($user->uid); // current user id
+  $ewrapper->status->set(0); // not published
+  $ewrapper->is_new->set(TRUE); // new node
+
+  // save node
+  if ($ewrapper->save() === FALSE) {
+    drupal_set_message(t('Could not import the selected node.'), 'warning');
+    return;
+  }
+
+  $nid = $local_node->nid;
+  $shared_node->nid = $nid;
+
+  // set shared state
+  if ($as_reference) {
+    $shared_node->shared_state = turntable_client::SHARED_REF;
+  } else {
+    $shared_node->shared_state = turntable_client::SHARED_COPY;
+  }
+
+  // parse ISO 8601 date
+  $shared_node->last_sync = DateTime::createFromFormat(DateTime::ISO8601,
+      $shared_node->last_sync);
+
+  // add shared node to db
+  $res = $db->addSharedNode($shared_node);
+
+  // show error
+  if ($res === FALSE) {
+    drupal_set_message(t('Could not import the selected node.'), 'warning');
+    return;
+  }
+
+  // messages according to state
+  if ($as_reference) {
+    drupal_set_message(t('Successfully imported selected node as a reference.'),
+        'status');
+  } else {
+    drupal_set_message(t('Successfully imported selected node as a copy.'),
+        'status');
+  }
+
+  // redirect the user to the newly created node
+  drupal_goto("node/$nid/edit");
 }
 
 /**
