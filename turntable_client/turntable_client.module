@@ -455,8 +455,6 @@ function sanitize_fields_find_image_refs(&$node) {
   unset($node->op);
   unset($node->rdf_mapping);
 
-  debug($node);
-
   return $image_refs;
 }
 
