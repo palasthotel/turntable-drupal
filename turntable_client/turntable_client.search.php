@@ -160,23 +160,24 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   unset($values['nid']);
   unset($values['vid']);
   unset($values['path']);
+  unset($values['uid']);
+
+  $values['uid'] = $user->uid;
+  $values['is_new'] = TRUE;
+  $values['status'] = 0;
 
   // create entity
   $local_node = entity_create('node', $values);
+  $local_node->uid = $user->uid;
   $ewrapper = entity_metadata_wrapper('node', $local_node);
   $image_refs = std_to_array(json_decode($shared_node->images));
 
-  debug($values['uid']);
   if (!resolve_image_references($ewrapper, $image_refs, TRUE)) {
     drupal_set_message(t('Could not import the selected node.'), 'warning');
     return;
   }
 
-  $ewrapper->uid->set($user->uid); // current user id
-  $ewrapper->status->set(0); // not published
-  $ewrapper->is_new->set(TRUE); // new node
-
-  // save node
+ // save node
   if ($ewrapper->save() === FALSE) {
     drupal_set_message(t('Could not import the selected node.'), 'warning');
     return;
