@@ -569,7 +569,10 @@ function update_ref($turntable_client, $db, $shared) {
   $ewrapper = entity_metadata_wrapper('node', $local_node);
   $image_refs = std_to_array(json_decode($shared_node->images));
 
-  resolve_image_references($ewrapper, $image_refs, FALSE);
+  // resolve image references
+  if (!resolve_image_references($ewrapper, $image_refs, FALSE)) {
+    return;
+  }
 
   // save node
   $ewrapper->save();
