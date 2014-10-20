@@ -53,6 +53,7 @@ function turntable_client_content_search($form, &$form_state) {
       $rows[$shared_node->nid] = array(
         $shared_node->title,
         $shared_node->author,
+        $shared_node->client_id,
         $shared_node->last_sync
       );
     }
@@ -64,6 +65,7 @@ function turntable_client_content_search($form, &$form_state) {
       '#header' => array(
         t('Title'),
         t('Author'),
+        t('Site ID'),
         t('Last sync')
       ),
       '#options' => $rows,
@@ -164,6 +166,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   $ewrapper = entity_metadata_wrapper('node', $local_node);
   $image_refs = std_to_array(json_decode($shared_node->images));
 
+  debug($values['uid']);
   if (!resolve_image_references($ewrapper, $image_refs, TRUE)) {
     drupal_set_message(t('Could not import the selected node.'), 'warning');
     return;
