@@ -504,6 +504,9 @@ function update_ref($turntable_client, $db, $shared) {
   $remote_time = DateTime::createFromFormat(DateTime::ISO8601,
       $shared_node->last_sync)->getTimestamp();
 
+  // add 24h inaccuracy, so timezones are somehow ignored
+  // $local_time = $local_time - 86400; // = 24h
+
   // if the remote time is not less than the local time, stop
   if ($remote_time <= $local_time) {
     return;
@@ -519,7 +522,7 @@ function update_ref($turntable_client, $db, $shared) {
   if (!in_array($values['type'], get_available_node_content_types())) {
     drupal_set_message(
         t(
-            'The selected node could not be imported due to incompatible content type.'),
+            'The selected node could not be imported due to incompatible content types.'),
         'warning');
     return;
   }
