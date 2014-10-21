@@ -32,6 +32,14 @@ function turntable_client_admin_settings() {
         'Number of hours between automatic updates of referenced nodes.')
   );
 
+  $form['turntable_client_upload_limit'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Turntable upload limit'),
+      '#default_value' => variable_get('turntable_client_upload_limit'),
+      '#description' => t(
+          'Number of nodes that are shared with the master during a single cron run.')
+  );
+
   $form['turntable_client_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Turntable Client ID'),
