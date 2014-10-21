@@ -270,43 +270,14 @@ function send_shared_node($turntable_client, $node) {
 
   $shared_node = array();
 
-  // set properties of $all
-  $all = new stdClass();
-  foreach ($node as $key => $value) {
-    // ignore some properties
-    if ($key !== 'original' && substr($key, 0, strlen('field_')) !== 'field_' &&
-         substr($key, 0, strlen('group_')) !== 'group_' &&
-         substr($key, 0, strlen('form_')) !== 'form_' && $key !== 'rdf_mapping') {
-      $all->$key = $value;
-    } else if ($key === 'field_image') {
-      $all->$key = $value;
-    }
-  }
-
   // create an array of all referenced images with the fid on the client and the
   // full url of the image
   $image_refs = sanitize_fields_find_image_refs($node);
 
-  // if (isset($ewrapper->field_image)) {
-  // foreach ($ewrapper->field_image->getIterator() as $i => $image) {
-  // try { // catch exceptions (temporary workaround)
-  // if ($image && is_object($image->value()) && $image->value()->uri != NULL) {
-  // $fid = $image->value()->fid;
-  // $uri = $image->value()->uri;
-  // $images[] = array(
-  // 'fid' => $fid,
-  // 'uri' => file_create_url($uri)
-  // );
-  // }
-  // } catch (Exception $e) {
-  // }
-  // }
-  // }
-
   // set data
   $shared_node['title'] = $node->title;
   $shared_node['language'] = $node->language;
-  $shared_node['all'] = json_encode($all); // full content
+  $shared_node['all'] = json_encode($node); // full content
 
   // set metadata
   $shared_node['node_id'] = $node->nid;
