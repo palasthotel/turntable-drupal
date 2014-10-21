@@ -215,6 +215,11 @@ function turntable_client_node_presave($node) {
 
   $shared_state = $turntable_client->getDB()->getSharedState($node->nid);
 
+  // if the node is not published yet, don't share it
+  if ($node->status == 0) {
+    return;
+  }
+
   if ($shared_state === turntable_client::SHARED_ORIG) {
     // if this node is set to SHARED_ORIG
     // send it to the master
