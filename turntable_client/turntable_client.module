@@ -213,11 +213,6 @@ function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
 function turntable_client_node_presave($node) {
   $turntable_client = turntable_client::getInstance();
 
-  // skip if this node is all new
-  if (!isset($node->nid)) {
-    return;
-  }
-
   $shared_state = $turntable_client->getDB()->getSharedState($node->nid);
 
   if ($shared_state === turntable_client::SHARED_ORIG) {
@@ -281,7 +276,9 @@ function send_shared_node($turntable_client, $node) {
 
   // set metadata
   $shared_node['node_id'] = $node->nid;
-  $shared_node['revision_uid'] = $node->revision_uid;
+  if (isset($node->revision_uid)) {
+    $shared_node['revision_uid'] = $node->revision_uid;
+  }
   $shared_node['content_type'] = $node->type;
 
   if (isset($user->name)) {
