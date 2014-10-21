@@ -23,6 +23,8 @@ function turntable_client_install() {
 
   variable_set('turntable_client_id', $base_url);
 
+  variable_set('turntable_client_upload_limit', 100);
+
   $turntable_client = turntable_client::getInstance();
   $turntable_client->install();
 }
