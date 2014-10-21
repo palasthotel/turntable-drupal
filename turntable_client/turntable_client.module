@@ -223,7 +223,7 @@ function turntable_client_node_presave($node) {
   if ($shared_state === turntable_client::SHARED_ORIG) {
     // if this node is set to SHARED_ORIG
     // send it to the master
-    send_shared_node($turntable_client, $node);
+    send_shared_node($turntable_client, $node, TRUE);
   } else if ($shared_state === -1) {
     // if the node's shared state has not yet been set
     $default_shared_node_types = variable_get(
@@ -239,7 +239,7 @@ function turntable_client_node_presave($node) {
       $turntable_client->getDB()->setSharedState($node->nid,
           turntable_client::SHARED_ORIG);
       // and send it to the master
-      send_shared_node($turntable_client, $node);
+      send_shared_node($turntable_client, $node, TRUE);
     } else {
       // otherwise set its state to SHARED_NONE
       $turntable_client->getDB()->setSharedState($node->nid,
@@ -255,7 +255,7 @@ function turntable_client_node_presave($node) {
  * @param array $node
  * @return boolean
  */
-function send_shared_node($turntable_client, $node) {
+function send_shared_node($turntable_client, $node, $show_messages = TRUE) {
   global $base_url;
   global $user;
 
@@ -300,20 +300,27 @@ function send_shared_node($turntable_client, $node) {
 
   // show errors
   if (!$response) {
-    drupal_set_message(t('Turntable Master could not process the request.'),
-        'warning');
+    if ($show_messages) {
+      drupal_set_message(t('Turntable Master could not process the request.'),
+          'warning');
+    }
     return FALSE;
   } else {
     $decoded = json_decode($response);
     if (!$decoded[0]) {
-      drupal_set_message(t('Turntable Master did not accept the request.'),
-          'warning');
+      if ($show_messages) {
+        drupal_set_message(t('Turntable Master did not accept the request.'),
+            'warning');
+      }
       return FALSE;
     }
   }
 
   $turntable_client->getDB()->setSharedLastSync($node->nid, time());
-  drupal_set_message(t('Shared the node with Turntable Master.'));
+
+  if ($show_messages) {
+    drupal_set_message(t('Shared the node with Turntable Master.'));
+  }
   return TRUE;
 }
 
@@ -498,7 +505,7 @@ function turntable_client_cron() {
   foreach ($db->getRemainingSharedNodes($limit) as $nid) {
     // send remaining shared nodes to master
     $node = node_load($nid);
-    send_shared_node($turntable_client, $node);
+    send_shared_node($turntable_client, $node, FALSE);
   }
 
   // update shared nodes
