@@ -379,6 +379,12 @@ function sanitize_fields_find_image_refs(&$node) {
     if ($type === 'field_item_image') {
       // get fid and uri/url of single image refs
       $image = $ewrapper->$field->value();
+
+      // skip empty field
+      if ($image == NULL) {
+        continue;
+      }
+
       $fid = $image['fid'];
       $url = get_image_url($image);
       $image_refs[] = array(
@@ -388,7 +394,18 @@ function sanitize_fields_find_image_refs(&$node) {
     } else if ($inner_type === 'field_item_image') {
       // get fid and uri/url of multiple image refs
       $images = $ewrapper->$field->value();
+
+      // skip empty field
+      if ($images == NULL) {
+        continue;
+      }
+
       foreach ($images as $i => $image) {
+        // skip empty field
+        if ($image == NULL) {
+          continue;
+        }
+
         $fid = $image['fid'];
         $url = get_image_url($image);
         $image_refs[] = array(
