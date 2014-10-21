@@ -33,11 +33,11 @@ function turntable_client_admin_settings() {
   );
 
   $form['turntable_client_upload_limit'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Turntable upload limit'),
-      '#default_value' => variable_get('turntable_client_upload_limit'),
-      '#description' => t(
-          'Number of nodes that are shared with the master during a single cron run.')
+    '#type' => 'textfield',
+    '#title' => t('Turntable upload limit'),
+    '#default_value' => variable_get('turntable_client_upload_limit', 100),
+    '#description' => t(
+        'Number of nodes that are shared with the master during a single cron run.')
   );
 
   $form['turntable_client_id'] = array(
@@ -90,7 +90,11 @@ function turntable_client_admin_settings_submit(&$form, &$form_state) {
 
   // set update interval
   variable_set('turntable_client_update_interval',
-      $form_state['values']['turntable_client_update_interval']);
+      (int) $form_state['values']['turntable_client_update_interval']);
+
+  // set upload limit
+  variable_set('turntable_client_upload_limit',
+      (int) $form_state['values']['turntable_client_upload_limit']);
 
   // set client id
   variable_set('turntable_client_id',
