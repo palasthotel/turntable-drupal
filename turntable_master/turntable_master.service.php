@@ -122,7 +122,7 @@ function turntable_master_get_image($url) {
   // if (!is_client_enabled()) {
   // return;
   // }
-  $dir = 'public://field/image/';
+  $dir = 'public://turntable_files/';
   $fname = url_to_filename($url);
   $uri = $dir . $fname;
 
