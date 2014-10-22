@@ -178,7 +178,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   }
 
   // invoke turntable_pre_import hook
-  module_invoke_all('turntable_pre_import', $ewrapper, $image_refs);
+  module_invoke_all('turntable_pre_import', $local_node, $image_refs);
 
  // save node
   if ($ewrapper->save() === FALSE) {
