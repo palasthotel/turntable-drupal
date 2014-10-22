@@ -6,7 +6,8 @@ require_once './sites/all/libraries/turntable/drupal/images.php';
 
 function turntable_master_save_shared_node($shared_node) {
   if (!is_client_enabled()) {
-    return;
+    header("HTTP/1.1 403 Forbidden");
+    return array('error' => 'Unknown Client');
   }
 
   $db = turntable_master::getInstance()->getDB();
@@ -76,7 +77,8 @@ function turntable_master_save_shared_node($shared_node) {
 
 function turntable_master_get_shared_node($nid) {
   if (!is_client_enabled()) {
-    return;
+    header("HTTP/1.1 403 Forbidden");
+    return array('error' => 'Unknown Client');
   }
 
   $nid = (int) $nid;
@@ -119,14 +121,21 @@ function turntable_master_find_shared_node($query) {
 function turntable_master_get_image($url) {
   // Don't check for valid client id's in image service
   // unable to set the correct http header in request
-  // if (!is_client_enabled()) {
-  // return;
-  // }
-  $dir = 'public://turntable_files/';
+  if (!is_client_enabled()) {
+    header("HTTP/1.1 403 Forbidden");
+    return array('error' => 'Unknown Client');
+  }
+
+  $dir = 'public://turntable/';
   $fname = url_to_filename($url);
   $uri = $dir . $fname;
 
   $info = ensure_image_is_available($dir, $fname, $url, FALSE);
+
+  if (!$info || isset($info['error'])) {
+    header("HTTP/1.1 404 Not Found");
+    return $info;
+  }
 
   // transfer the image to the client
   file_transfer($uri,
