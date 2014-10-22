@@ -225,7 +225,7 @@ function turntable_master_access($op, $args) {
 }
 
 function turntable_master_cron() {
-  $image_dir = 'public://field/image/';
+  $image_dir = 'public://turntable/';
 
   if (!file_exists($image_dir)) {
     return;
