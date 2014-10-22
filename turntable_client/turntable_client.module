@@ -205,12 +205,20 @@ function turntable_client_shared_state_settings_submit(&$form, &$form_state) {
   }
 }
 
+function turntable_client_node_insert($node) {
+  turntable_client_node_save_upload($node);
+}
+
+function turntable_client_node_update($node) {
+  turntable_client_node_save_upload($node);
+}
+
 /**
  * Handle the saving of a node
  *
- * @param array $node
+ * @param stdClass $node
  */
-function turntable_client_node_presave($node) {
+function turntable_client_node_save_upload($node) {
   $turntable_client = turntable_client::getInstance();
 
   $shared_state = $turntable_client->getDB()->getSharedState($node->nid);
