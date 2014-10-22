@@ -177,6 +177,9 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     return;
   }
 
+  // invoke turntable_pre_import hook
+  module_invoke_all('turntable_pre_import', $ewrapper, $image_refs);
+
  // save node
   if ($ewrapper->save() === FALSE) {
     drupal_set_message(t('Could not import the selected node.'), 'warning');
