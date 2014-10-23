@@ -386,7 +386,7 @@ function sanitize_fields_find_image_refs(&$node) {
 
     if ($type === FALSE && !(isset($field_properties['required']) &&
          $field_properties['required'] === TRUE)) {
-      // check for title, comment_count etc.
+      // check for title, comment_count etc. which have no type
       // only required fields will be kept
       unset($node->$field);
     }
@@ -404,7 +404,8 @@ function sanitize_fields_find_image_refs(&$node) {
       $url = get_image_url($image);
       $image_refs[] = array(
         'fid' => $fid,
-        'uri' => $url
+        'uri' => $url,
+        'field_name' => $field
       );
     } else if ($inner_type === 'field_item_image') {
       // get fid and uri/url of multiple image refs
@@ -425,7 +426,8 @@ function sanitize_fields_find_image_refs(&$node) {
         $url = get_image_url($image);
         $image_refs[] = array(
           'fid' => $fid,
-          'uri' => $url
+          'uri' => $url,
+          'field_name' => $field
         );
       }
     }
