@@ -48,7 +48,7 @@ function turntable_client_menu() {
       'turntable_client_shared_state_settings'
     ),
     'access arguments' => array(
-      'administer content'
+      'administer nodes'
     ),
     'type' => MENU_LOCAL_TASK,
     'file' => 'turntable_client.module'
@@ -62,7 +62,7 @@ function turntable_client_menu() {
       'turntable_client_content_search'
     ),
     'access arguments' => array(
-      'administer content'
+      'administer nodes'
     ),
     'type' => MENU_LOCAL_TASK,
     'file' => 'turntable_client.search.php'
