@@ -538,9 +538,6 @@ function update_ref($turntable_client, $db, $shared) {
   $remote_time = DateTime::createFromFormat(DateTime::ISO8601,
       $shared_node->last_sync)->getTimestamp();
 
-  // add 24h inaccuracy, so timezones are somehow ignored
-  // $local_time = $local_time - 86400; // = 24h
-
   // if the remote time is not less than the local time, stop
   if ($remote_time <= $local_time) {
     return;
