@@ -1,7 +1,4 @@
 <?php
-// FIXME
-ini_set('display_errors', TRUE);
-
 require_once './sites/all/libraries/turntable/turntable_master.php';
 
 function turntable_master_menu() {
