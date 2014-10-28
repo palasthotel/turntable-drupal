@@ -172,9 +172,17 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   $ewrapper = entity_metadata_wrapper('node', $local_node);
   $image_refs = std_to_array(json_decode($shared_node->images));
 
-  if (!resolve_image_references($ewrapper, $image_refs, TRUE)) {
+  $resolved = resolve_image_references($ewrapper, $image_refs, TRUE);
+
+  if ($resolved === FALSE) {
     drupal_set_message(t('Could not import the selected node.'), 'warning');
     return;
+  } else if ($resolved === 'missing_images') {
+    // when there are missing images, don't set a last_sync date, so the node
+    // ref will be updated on the next cron run, no matter if it has been really
+    // updated on its original client. (This is to ensure that images will be
+    // downloaded again until they are available.)
+    unset($shared_node->last_sync);
   }
 
   // invoke turntable_pre_import_references hook
@@ -197,8 +205,10 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   }
 
   // parse ISO 8601 date
-  $shared_node->last_sync = DateTime::createFromFormat(DateTime::ISO8601,
-      $shared_node->last_sync);
+  if (isset($shared_node->last_sync)) {
+    $shared_node->last_sync = DateTime::createFromFormat(DateTime::ISO8601,
+        $shared_node->last_sync);
+  }
 
   // add shared node to db
   $res = $db->addSharedNode($shared_node);
