@@ -537,8 +537,6 @@ function update_ref($turntable_client, $db, $shared) {
   $remote_time = DateTime::createFromFormat(DateTime::ISO8601,
       $shared_node->last_sync)->getTimestamp();
 
-  echo $shared['nid'] . " local: $local_time, remote: $remote_time <br>";
-
   // if the remote time is not less than the local time, stop
   if ($remote_time <= $local_time) {
     return;
@@ -572,12 +570,12 @@ function update_ref($turntable_client, $db, $shared) {
   $ewrapper = entity_metadata_wrapper('node', $new_node);
   $image_refs = std_to_array(json_decode($shared_node->images));
 
-  $result = resolve_image_references($ewrapper, $image_refs, FALSE);
-
   // resolve image references
-  if ($result === FALSE) {
+  $resolved = resolve_image_references($ewrapper, $image_refs, FALSE);
+
+  if ($resolved === FALSE) {
     return;
-  } else if ($result === 'missing_images') {
+  } else if ($resolved === 'missing_images') {
     // update last sync (locally)
     $db->setSharedLastSync($shared['nid'], NULL);
   } else {
