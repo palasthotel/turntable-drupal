@@ -47,7 +47,7 @@ function turntable_client_menu() {
     'access arguments' => array(
       'administer nodes'
     ),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
     'file' => 'turntable_client.module'
   );
 
@@ -61,7 +61,7 @@ function turntable_client_menu() {
     'access arguments' => array(
       'administer nodes'
     ),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
     'file' => 'turntable_client.search.php'
   );
 
