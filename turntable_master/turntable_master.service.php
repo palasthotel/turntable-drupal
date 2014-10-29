@@ -152,8 +152,10 @@ function is_client_enabled() {
   // get the client id from the http headers
   if (isset($_SERVER['HTTP_TURNTABLE_CLIENT_ID'])) {
     $client_id = $_SERVER['HTTP_TURNTABLE_CLIENT_ID'];
-  } else {
+  } else if(isset($_GET['client_id'])) {
     $client_id = $_GET['client_id'];
+  } else {
+    return FALSE;
   }
 
   return in_array($client_id, $enabled_clients);
