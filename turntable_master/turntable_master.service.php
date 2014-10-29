@@ -119,8 +119,6 @@ function turntable_master_find_shared_node($query) {
 }
 
 function turntable_master_get_image($url) {
-  // Don't check for valid client id's in image service
-  // unable to set the correct http header in request
   if (!is_client_enabled()) {
     header("HTTP/1.1 403 Forbidden");
     return array('error' => 'Unknown Client');
