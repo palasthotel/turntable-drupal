@@ -156,7 +156,12 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     return;
   }
 
-  // remove some attributes
+  // set canonical url
+  $values['metatags']['und']['canonical']['value'] = $values['original_url'];
+  unset($values['original_url']);
+
+  // remove some attributes (may have already been removed on the original
+  // client)
   unset($values['nid']);
   unset($values['vid']);
   unset($values['path']);

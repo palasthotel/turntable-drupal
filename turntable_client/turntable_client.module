@@ -560,6 +560,9 @@ function update_ref($turntable_client, $db, $shared) {
     return;
   }
 
+  $values['metatags']['und']['canonical']['value'] = $values['original_url'];
+  unset($values['original_url']);
+
   $old_node = node_load($shared['nid']);
 
   // use settings from old node
