@@ -63,6 +63,13 @@ function turntable_client_admin_settings() {
         'Node types that are shared by default when they are saved.')
   );
 
+  $form['turntable_term'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Turntable alternative term'),
+    '#default_value' => variable_get('turntable_term', 'Turntable'),
+    '#description' => t('Term that is used instead of "Turntable".')
+  );
+
   $form['#submit'][] = 'turntable_client_admin_settings_submit';
 
   return system_settings_form($form);
@@ -99,6 +106,10 @@ function turntable_client_admin_settings_submit(&$form, &$form_state) {
   // set client id
   variable_set('turntable_client_id',
       $form_state['values']['turntable_client_id']);
+
+  // turntable term
+  variable_set('turntable_term',
+      $form_state['values']['turntable_term']);
 
   // get the string we need to store
   $selection = $form_state['values']['turntable_client_share_node_types'];

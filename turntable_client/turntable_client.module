@@ -10,8 +10,12 @@ require_once './sites/all/libraries/turntable/drupal/util.php';
  * @return array
  */
 function turntable_client_menu() {
+  $term = variable_get('turntable_term', 'Turntable');
+
   $items['admin/config/turntable-client'] = array(
-    'title' => t('Turntable Client'),
+    'title' => t('@turntable Client', array(
+      '@turntable' => $term
+    )),
     'description' => t(
         'Synchronize content between various Drupal installations'),
     'position' => 'right',
@@ -25,8 +29,13 @@ function turntable_client_menu() {
   );
 
   $items['admin/config/turntable-client/settings'] = array(
-    'title' => t('Turntable Client Settings'),
-    'description' => t('Change how Turntable Client behaves.'),
+    'title' => t('@turntable Client Settings', array(
+      '@turntable' => $term
+    )),
+    'description' => t('Change how @turntable Client behaves.',
+        array(
+          '@turntable' => $term
+        )),
     'page callback' => 'drupal_get_form',
     'page arguments' => array(
       'turntable_client_admin_settings'
@@ -39,7 +48,9 @@ function turntable_client_menu() {
   );
 
   $items['node/%/turntable'] = array(
-    'title' => t('Turntable'),
+    'title' => t('@turntable', array(
+      '@turntable' => $term
+    )),
     'page callback' => 'drupal_get_form',
     'page arguments' => array(
       'turntable_client_shared_state_settings'
@@ -47,13 +58,15 @@ function turntable_client_menu() {
     'access arguments' => array(
       'administer nodes'
     ),
-    'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
     'file' => 'turntable_client.module'
   );
 
   // search form
   $items['admin/content/turntable-search'] = array(
-    'title' => t('Turntable Search'),
+    'title' => t('@turntable Search', array(
+      '@turntable' => $term
+    )),
     'page callback' => 'drupal_get_form',
     'page arguments' => array(
       'turntable_client_content_search'
@@ -61,7 +74,7 @@ function turntable_client_menu() {
     'access arguments' => array(
       'administer nodes'
     ),
-    'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
     'file' => 'turntable_client.search.php'
   );
 

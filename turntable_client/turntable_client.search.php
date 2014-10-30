@@ -6,10 +6,13 @@ require_once './sites/all/libraries/turntable/drupal/util.php';
 
 function turntable_client_content_search($form, &$form_state) {
   global $base_url;
+  $term = variable_get('turntable_term', 'Turntable');
 
   $form['turntable_client_content_search'] = array(
     '#type' => 'textfield',
-    '#title' => t('Turntable Search'),
+    '#title' => t('@turntable Search', array(
+      '@turntable' => $term
+    )),
     '#description' => t(
         'Searches all fields that are shared within the node. Terms are space separated.')
   );
