@@ -29,9 +29,10 @@ function turntable_client_menu() {
   );
 
   $items['admin/config/turntable-client/settings'] = array(
-    'title' => t('@turntable Client Settings', array(
-      '@turntable' => $term
-    )),
+    'title' => t('@turntable Client Settings',
+        array(
+          '@turntable' => $term
+        )),
     'description' => t('Change how @turntable Client behaves.',
         array(
           '@turntable' => $term
@@ -280,6 +281,12 @@ function send_shared_node($turntable_client, $node, $show_messages = TRUE) {
 
   // prevent sharing of unpublished nodes
   if ($node->status != 1) {
+    return;
+  }
+
+  // check if another module wants to prevent this node from being shared
+  $enable_sharing = module_invoke_all('turntable_node_enable_sharing', $node);
+  if (in_array(FALSE, $enable_sharing)) {
     return;
   }
 
