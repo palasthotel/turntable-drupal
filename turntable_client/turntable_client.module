@@ -55,6 +55,7 @@ function turntable_client_menu() {
     'page arguments' => array(
       'turntable_client_shared_state_settings'
     ),
+    'weight' => 10,
     'access arguments' => array(
       'administer nodes'
     ),
