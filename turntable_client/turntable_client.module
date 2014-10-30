@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+
 require_once './sites/all/libraries/turntable/turntable_client.php';
 require_once './sites/all/libraries/turntable/core/http.php';
 require_once './sites/all/libraries/turntable/drupal/images.php';
@@ -587,17 +589,17 @@ function update_ref($turntable_client, $db, $shared) {
   $old_node = node_load($shared['nid']);
 
   // use settings from old node
+  $values['nid'] = $old_node->nid;
   $values['uid'] = $old_node->uid;
   $values['status'] = $old_node->status;
   $values['comment'] = $old_node->comment;
   $values['promote'] = $old_node->promote;
   $values['vid'] = $old_node->vid;
 
-  // set nid
-  $values['nid'] = $shared['nid'];
   $new_node = entity_create('node', $values);
 
   $ewrapper = entity_metadata_wrapper('node', $new_node);
+
   $image_refs = std_to_array(json_decode($shared_node->images));
 
   // resolve image references
@@ -611,6 +613,9 @@ function update_ref($turntable_client, $db, $shared) {
   } else {
     // update last sync (locally)
     $db->setSharedLastSync($shared['nid'], $remote_time);
+
+    // invoke turntable_pre_import_references hook
+    module_invoke_all('turntable_pre_import_references', $new_node, $image_refs);
   }
 
   // save node

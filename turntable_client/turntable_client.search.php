@@ -191,53 +191,58 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     // updated on its original client. (This is to ensure that images will be
     // downloaded again until they are available.)
     unset($shared_node->last_sync);
-  }
-
-  // invoke turntable_pre_import_references hook
-  module_invoke_all('turntable_pre_import_references', $local_node, $image_refs);
-
-  // save node
-  if ($ewrapper->save() === FALSE) {
-    drupal_set_message(t('Could not import the selected node.'), 'warning');
-    return;
-  }
-
-  $nid = $local_node->nid;
-  $shared_node->nid = $nid;
-
-  // set shared state
-  if ($as_reference) {
-    $shared_node->shared_state = turntable_client::SHARED_REF;
   } else {
-    $shared_node->shared_state = turntable_client::SHARED_COPY;
+    // invoke turntable_pre_import_references hook
+    module_invoke_all('turntable_pre_import_references', $local_node,
+        $image_refs);
   }
 
-  // parse ISO 8601 date
-  if (isset($shared_node->last_sync)) {
-    $shared_node->last_sync = DateTime::createFromFormat(DateTime::ISO8601,
-        $shared_node->last_sync);
+  try {
+    // save node
+    if ($ewrapper->save() === FALSE) {
+      drupal_set_message(t('Could not import the selected node.'), 'warning');
+      return;
+    }
+
+    $nid = $local_node->nid;
+    $shared_node->nid = $nid;
+
+    // set shared state
+    if ($as_reference) {
+      $shared_node->shared_state = turntable_client::SHARED_REF;
+    } else {
+      $shared_node->shared_state = turntable_client::SHARED_COPY;
+    }
+
+    // parse ISO 8601 date
+    if (isset($shared_node->last_sync)) {
+      $shared_node->last_sync = DateTime::createFromFormat(DateTime::ISO8601,
+          $shared_node->last_sync);
+    }
+
+    // add shared node to db
+    $res = $db->addSharedNode($shared_node);
+
+    // show error
+    if ($res === FALSE) {
+      drupal_set_message(t('Could not import the selected node.'), 'warning');
+      return;
+    }
+
+    // messages according to state
+    if ($as_reference) {
+      drupal_set_message(
+          t('Successfully imported selected node as a reference.'), 'status');
+    } else {
+      drupal_set_message(t('Successfully imported selected node as a copy.'),
+          'status');
+    }
+
+    // redirect the user to the newly created node
+    drupal_goto("node/$nid/edit");
+  } catch (EntityMetadataWrapperException $e) {
+    drupal_set_message($e->getMessage(), 'error');
   }
-
-  // add shared node to db
-  $res = $db->addSharedNode($shared_node);
-
-  // show error
-  if ($res === FALSE) {
-    drupal_set_message(t('Could not import the selected node.'), 'warning');
-    return;
-  }
-
-  // messages according to state
-  if ($as_reference) {
-    drupal_set_message(t('Successfully imported selected node as a reference.'),
-        'status');
-  } else {
-    drupal_set_message(t('Successfully imported selected node as a copy.'),
-        'status');
-  }
-
-  // redirect the user to the newly created node
-  drupal_goto("node/$nid/edit");
 }
 
 /**
