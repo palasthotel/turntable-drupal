@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-
 require_once './sites/all/libraries/turntable/turntable_client.php';
 require_once './sites/all/libraries/turntable/core/http.php';
 require_once './sites/all/libraries/turntable/drupal/images.php';
