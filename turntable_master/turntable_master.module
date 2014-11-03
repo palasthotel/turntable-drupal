@@ -1,5 +1,6 @@
 <?php
 require_once './sites/all/libraries/turntable/turntable_master.php';
+require_once './sites/all/libraries/turntable/drupal/admin_view.php';
 
 function turntable_master_menu() {
   $items['admin/config/turntable-master'] = array(
@@ -238,5 +239,24 @@ function turntable_master_cron() {
   }
 
   closedir($handle);
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function turntable_master_views_api() {
+  return array(
+    'api' => 3.0
+  );
+}
+
+function turntable_master_views_default_views() {
+  $is_master = TRUE;
+  $view = _get_admin_view($is_master);
+
+  $views[$view->name] = $view;
+
+  // return views
+  return $views;
 }
 
