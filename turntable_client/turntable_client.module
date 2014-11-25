@@ -642,22 +642,7 @@ function update_ref($turntable_client, $db, $shared) {
  */
 function turntable_client_views_api() {
   return array(
-    'api' => 3.0
+    'api' => 3.0,
+    'path' => drupal_get_path('module', 'turntable_client') . '/views'
   );
-}
-
-function turntable_client_views_default_views() {
-  $is_master = FALSE;
-  $view = _get_admin_view($is_master);
-
-  $views[$view->name] = $view;
-
-  // return views
-  return $views;
-}
-
-function my_module_views_data_alter(&$data) {
-  $data['node']['shared_content']['title'] = 'Shared content';
-  $data['node']['shared_content']['help'] = 'Only shows shared content.';
-  $data['node']['shared_content']['filter']['handler'] = 'turntable_client_views_content_filter';
 }

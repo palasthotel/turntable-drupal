@@ -2,6 +2,8 @@
 require_once './sites/all/libraries/turntable/turntable_master.php';
 require_once './sites/all/libraries/turntable/drupal/admin_view.php';
 
+$db = turntable_master::getInstance()->getDB();
+
 function turntable_master_menu() {
   $items['admin/config/turntable-master'] = array(
     'title' => t('Turntable Master'),
