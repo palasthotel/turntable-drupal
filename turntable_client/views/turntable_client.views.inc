@@ -2,10 +2,6 @@
 /*
  * function turntable_client_views_default_views() { $is_master = FALSE; $view = _get_admin_view($is_master); $views[$view->name] = $view; // return views return $views; }
  */
-function turntable_client_views_pre_execute(&$view) {
-  // echo ($view->build_info['query']) + "\n\n";
-}
-
 function turntable_client_views_data() {
   $data['tt_client_node_shared']['table']['group'] = t('Shared Content');
 
@@ -49,7 +45,7 @@ function turntable_client_views_data() {
       'title' => t('Shared state'),
       'help' => t('Sharing state of the node.'),
       'field' => array(
-          'handler' => 'views_handler_field',
+          'handler' => 'turntable_shared_state_handler',
           'click sortable' => TRUE, // This is used by the table display plugin.
       ),
       'sort' => array(
@@ -68,7 +64,7 @@ function turntable_client_views_data() {
       'title' => t('Last sync'),
       'help' => t('Date of the last synchronization.'),
       'field' => array(
-          'handler' => 'views_handler_field_date',
+          'handler' => 'turntable_shared_state_date_handler',
           'click sortable' => TRUE,
       ),
       'sort' => array(
