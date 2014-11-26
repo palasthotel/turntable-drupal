@@ -11,13 +11,10 @@ class turntable_shared_state_handler extends views_handler_field {
     switch ($value) {
       case '0' :
         return t('Not shared');
-        break;
       case '1' :
         return t('Copy');
-        break;
       case '2' :
         return t('Reference');
-        break;
       case '3' :
         return t('Original node');
       default :
