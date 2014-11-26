@@ -66,8 +66,6 @@ class turntable_edit_tt_settings_handler extends views_handler_field_node_link {
       return;
     }
 
-    debug(views_fetch_data($this->table));
-
     $this->options['alter']['make_link'] = TRUE;
     $this->options['alter']['path'] = "node/$node->nid/turntable";
     $this->options['alter']['query'] = drupal_get_destination();
