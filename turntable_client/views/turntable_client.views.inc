@@ -40,8 +40,26 @@ function turntable_client_views_data() {
     'help' => t('Sharing state of the node.'),
     'field' => array(
       'handler' => 'turntable_shared_state_handler',
-      'click sortable' => TRUE  // This is used by the table display plugin.
-        ),
+      'click sortable' => TRUE
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort'
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string'
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string'
+    )
+  );
+
+  $data['tt_client_node_shared']['original_client_id'] = array(
+    'title' => t('Origin'),
+    'help' => t('Original site.'),
+    'field' => array(
+      'handler' => 'turntable_origin_handler',
+      'click sortable' => TRUE
+    ),
     'sort' => array(
       'handler' => 'views_handler_sort'
     ),
@@ -68,14 +86,19 @@ function turntable_client_views_data() {
     )
   );
 
-  // $data['tt_client_node_shared'][''] = array(
-  // 'title' => t('Change sharing state'),
-  // 'help' => t('Change the sharing state of the node.'),
-  // 'field' => array(
-  // 'handler' => 'turntable_edit_sharing_state_handler',
-  // 'click sortable' => TRUE
-  // )
-  // );
+  $data['custom']['table']['group'] = t('Shared Content');
+  $data['custom']['table']['join'] = array(
+    '#global' => array()
+  );
+  $data['custom']['table']['entity type'] = 'node';
+
+  $data['custom']['edit_tt_settings'] = array(
+    'title' => t('Turntable settings'),
+    'help' => t('Edit Turntable settings.'),
+    'field' => array(
+      'handler' => 'turntable_edit_tt_settings_handler'
+    )
+  );
 
   return $data;
 }
