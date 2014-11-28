@@ -9,5 +9,6 @@ files[] = turntable_client.install
 files[] = turntable_client.search.php
 files[] = turntable_client.settings.php
 files[] = views/turntable_client.views.inc
+files[] = views/turntable_client.views_default.inc
 files[] = views/turntable_client.handlers.inc
 configure=admin/config/turntable-client/settings
