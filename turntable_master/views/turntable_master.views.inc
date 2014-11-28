@@ -1,5 +1,5 @@
 <?php
-function turntable_client_views_data() {
+function turntable_master_views_data() {
   $data['tt_master_node_shared']['table']['group'] = t('Shared Content');
 
   $data['tt_master_node_shared']['table']['base'] = array(
@@ -36,7 +36,7 @@ function turntable_client_views_data() {
     'title' => t('Origin'),
     'help' => t('Original site.'),
     'field' => array(
-      'handler' => 'turntable_origin_handler',
+      'handler' => 'views_handler_field',
       'click sortable' => TRUE
     ),
     'sort' => array(
@@ -48,6 +48,24 @@ function turntable_client_views_data() {
     'argument' => array(
       'handler' => 'views_handler_argument_string'
     )
+  );
+
+  $data['tt_master_node_shared']['client_author_name'] = array(
+      'title' => t('Original author'),
+      'help' => t('Original author name.'),
+      'field' => array(
+          'handler' => 'views_handler_field',
+          'click sortable' => TRUE
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort'
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_string'
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_string'
+      )
   );
 
   $data['tt_master_node_shared']['last_sync'] = array(
