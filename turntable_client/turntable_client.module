@@ -81,22 +81,6 @@ function turntable_client_menu() {
     'file' => 'turntable_client.search.php'
   );
 
-  $items['admin/content/turntable-manager'] = array(
-    'title' => t('@turntable Manager',
-        array(
-          '@turntable' => $term
-        )),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array(
-      'turntable_client_content_manager'
-    ),
-    'access arguments' => array(
-      'administer nodes'
-    ),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'turntable_client.manager.php'
-  );
-
   return $items;
 }
 
