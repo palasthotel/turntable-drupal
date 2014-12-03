@@ -14,7 +14,7 @@ function turntable_client_content_search($form, &$form_state) {
       '@turntable' => $term
     )),
     '#description' => t(
-        'Searches all fields that are shared within the node. Terms are space separated.')
+        'Searches all fields that are shared within the node. Terms are space separated. If a shared node cannot be found, ensure it has the correct settings on the original client.')
   );
 
   $form['turntable_client_content_search_submit'] = array(
