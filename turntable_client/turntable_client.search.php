@@ -56,6 +56,7 @@ function turntable_client_content_search($form, &$form_state) {
       $rows[$shared_node->nid] = array(
         $shared_node->title,
         $shared_node->author,
+        $shared_node->content_type,
         $shared_node->client_id,
         $shared_node->last_sync
       );
@@ -68,6 +69,7 @@ function turntable_client_content_search($form, &$form_state) {
       '#header' => array(
         t('Title'),
         t('Author'),
+        t('Type'),
         t('Site ID'),
         t('Last sync')
       ),
