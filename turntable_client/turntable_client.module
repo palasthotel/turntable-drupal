@@ -467,7 +467,7 @@ function sanitize_fields_find_image_refs(&$node) {
   unset($node->last_comment_uid);
 
   // remember original url
-  $node->original_url = url($node->path['source'],
+  $node->original_url = url('node/' . $node->nid,
       array(
         'absolute' => TRUE
       ));
