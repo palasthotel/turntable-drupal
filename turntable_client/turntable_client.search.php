@@ -160,7 +160,7 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   }
 
   // set canonical url
-  $values['metatags'][$values['language']]['canonical']['value'] = $values['original_url'];
+  $values['metatags']['und']['canonical']['value'] = $values['original_url'];
   unset($values['original_url']);
 
   // remove some attributes (may have already been removed on the original
