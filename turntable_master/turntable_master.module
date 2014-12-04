@@ -126,7 +126,7 @@ function turntable_master_services_resources() {
       )
     ),
     'image' => array(
-      'index' => array( // why do I need index? is this a bug?
+      'index' => array( // why do we need index? is this a bug?
         'help' => t('Gets an image from a client'),
         'file' => array(
           'file' => 'service.php',
