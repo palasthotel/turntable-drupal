@@ -590,10 +590,11 @@ function update_ref($turntable_client, $db, $shared) {
   // use settings from old node
   $values['nid'] = $old_node->nid;
   $values['uid'] = $old_node->uid;
+  $values['vid'] = $old_node->vid;
   $values['status'] = $old_node->status;
   $values['comment'] = $old_node->comment;
   $values['promote'] = $old_node->promote;
-  $values['vid'] = $old_node->vid;
+  $values['is_new'] = FALSE;
 
   $new_node = entity_create('node', $values);
 
