@@ -162,8 +162,12 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
   }
 
   // set canonical url
-  $values['metatags']['und']['canonical']['value'] = $values['original_url'];
-  unset($values['original_url']);
+  if (isset($values['original_url'])) {
+    $canonical = $values['original_url'];
+    unset($values['original_url']);
+  } else {
+    $canonical = null;
+  }
 
   // remove some attributes (may have already been removed on the original
   // client)
@@ -238,6 +242,12 @@ function turntable_client_content_search_create(&$form_state, $as_reference) {
     } else {
       drupal_set_message(t('Successfully imported selected node as a copy.'),
           'status');
+    }
+
+    if ($canonical !== null) {
+      $metatags = metatag_metatags_load('node', $local_node->nid);
+      $metatags['und']['canonical']['value'] = $canonical;
+      metatag_metatags_save('node', $local_node->nid, $local_node->vid, $metatags, 'und');
     }
 
     // redirect the user to the newly created node

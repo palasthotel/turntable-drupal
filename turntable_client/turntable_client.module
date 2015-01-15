@@ -582,8 +582,12 @@ function update_ref($turntable_client, $db, $shared) {
     return;
   }
 
-  $values['metatags']['und']['canonical']['value'] = $values['original_url'];
-  unset($values['original_url']);
+  if (isset($values['original_url'])) {
+    $canonical = $values['original_url'];
+    unset($values['original_url']);
+  } else {
+    $canonical = null;
+  }
 
   $old_node = node_load($shared['nid']);
 
