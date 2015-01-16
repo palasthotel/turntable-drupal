@@ -125,5 +125,6 @@ function turntable_client_admin_settings_submit(&$form, &$form_state) {
     $turntable_client = turntable_client::getInstance();
     $db = $turntable_client->getDB();
     $db->resetRemainingSharedNodes();
+    drupal_set_message(t('Reset sharing index.'), 'status');
   }
 }
