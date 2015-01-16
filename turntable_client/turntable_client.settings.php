@@ -1,4 +1,5 @@
 <?php
+require_once './sites/all/libraries/turntable/turntable_client.php';
 
 /**
  * @file
@@ -62,6 +63,13 @@ function turntable_client_admin_settings() {
     '#description' => t('Term that is used instead of "Turntable".')
   );
 
+  $form['turntable_reset_sharing'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Reset sharing index'),
+    '#options' => array('Reset'),
+    '#description' => t('All nodes that have a shared node type will be shared again.')
+  );
+
   $form['#submit'][] = 'turntable_client_admin_settings_submit';
 
   return system_settings_form($form);
@@ -110,4 +118,12 @@ function turntable_client_admin_settings_submit(&$form, &$form_state) {
 
   // set selected node types
   variable_set('turntable_client_share_node_types', $selected_node_types);
+
+  // reset sharing
+  $reset = $form_state['values']['turntable_reset_sharing'];
+  if (count($reset) > 0) {
+    $turntable_client = turntable_client::getInstance();
+    $db = $turntable_client->getDB();
+    $db->resetRemainingSharedNodes();
+  }
 }
